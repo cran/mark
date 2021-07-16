@@ -30,15 +30,9 @@ ksource <- function(file, ..., quiet = TRUE, cd = FALSE, env = parent.frame()) {
     stop("env is not an environment", call. = FALSE)
   }
 
-  source(
-    knitr::purl(
-      file,
-      output = tempfile(),
-      quiet = quiet
-    ),
-    chdir = cd,
-    local = env
-  )
+  o <- mark_temp("R")
+  on.exit(file.remove(o), add = TRUE)
+  source(knitr::purl(file, output = o, quiet = quiet), chdir = cd, local = env)
 }
 
 
@@ -103,6 +97,8 @@ try_ksource <- function(file, ...) {
 #' eval_named_chunk(temp_rmd, "hello label")
 #' # [1] "hello, world"
 #' # [1] TRUE
+#'
+#' file.remove(temp_rmd)
 
 eval_named_chunk <- function(rmd_file, label_name) {
   if (!grepl("\\.[Rr][Mm][Dd]$", rmd_file)) {
@@ -193,10 +189,10 @@ source_r_file <- function(path, echo = FALSE, quiet = FALSE, ...) {
 #' @return Invisibly, and environment variable of the objects/results created from `x`
 #' @export
 source_to_env <- function(x, ops = NULL) {
-  rds_file <- mark_temp(".Rds")
-  r_temp   <- mark_temp(".R")
-  std_out  <- mark_temp(".md")
-  std_err  <- mark_temp(".md")
+  rds_file <- mark_temp("Rds")
+  r_temp   <- mark_temp("R")
+  std_out  <- mark_temp("md")
+  std_err  <- mark_temp("md")
 
   file.copy(x, r_temp)
 
@@ -228,7 +224,7 @@ source_to_env <- function(x, ops = NULL) {
 
   on.exit({
     close(con)
-    file.remove(r_temp, rds_file)
+    file.remove(r_temp, rds_file, std_out, std_err)
   }, add = TRUE)
 
   invisible(res)
@@ -310,34 +306,6 @@ print.source_env <- function(x, ...) {
     sep = ""
   )
   invisible(x)
-}
-
-mark_temp <- function(ext = "") {
-  if (!grepl("^[.]", ext) && !identical(ext, "") && !is.na(ext)) {
-    ext <- paste0(".", ext)
-  }
-
-  file <- basename(tempfile("", fileext = ext))
-  path <- file_path(mark_dir(), "_temp_files")
-
-  if (!dir.exists(path)) {
-    dir.create(path, recursive = TRUE)
-  }
-
-  file_path(norm_path(path), file)
-}
-
-mark_dir <- function() {
-  # Not not available in prior editions
-  rud <- get0("R_user_dir", envir = asNamespace("tools"), mode = "function")
-
-  if (is.null(rud)) {
-    dm <- file_path(tempdir(), "_R_mark")
-    if (!is_dir(dm)) dir.create(dm)
-    return(dm)
-  }
-
-  ("tools" %colons% "R_user_dir")("mark")
 }
 
 utils::globalVariables(c("source_file_r", "quiet"))

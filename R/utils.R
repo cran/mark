@@ -152,3 +152,35 @@ which_unwrap <- function(w, n = max(w)) {
 cat0 <- function(...) cat(..., sep = "")
 catln <- function(...) cat(..., sep = "\n")
 charexpr <- function(x) as.character(as.expression(x))
+
+
+mark_temp <- function(ext = "") {
+  if (!grepl("^[.]", ext) && !identical(ext, "") && !is.na(ext)) {
+    ext <- paste0(".", ext)
+  }
+
+  file <- basename(tempfile("", fileext = ext))
+  path <- file_path(mark_dir())
+  dir.create(path, recursive = TRUE, showWarnings = FALSE)
+  file_path(path, file)
+}
+
+mark_dir <- function() {
+  R <- getRversion()
+  if (R < 4) {
+    dm <- file_path(tempdir(), "_R_mark_temp_files")
+    dir.create(dm, recursive = TRUE, showWarnings = FALSE)
+    return(dm)
+  }
+
+  # Not not available in prior editions
+  rud <- get0("R_user_dir", envir = asNamespace("tools"), mode = "function")
+
+  if (is.null(rud)) {
+    stop("tools::R_user_dir() not found with R ", R)
+  }
+
+  res <- rud("mark")
+  dir.create(res, recursive = TRUE, showWarnings = FALSE)
+  res
+}
