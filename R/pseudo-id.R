@@ -4,8 +4,9 @@
 #'
 #' @param x A vector of values
 #'
-#' @return A vector of `integers` corresponding to the unique values in the
-#'   attribute `"uniques"`.
+#' @returns A `pseudo_id` object where the `integer` value of the vector
+#' correspond to the position of the unique values in the attribute `"uniques"`.
+#'
 #' @examples
 #' set.seed(42)
 #' (x <- sample(letters, 10, TRUE))
@@ -19,25 +20,42 @@ pseudo_id <- function(x) {
 
 #' @export
 #' @rdname pseudo_id
+pseudo_id.pseudo_id <- function(x) {
+  x
+}
+
+#' @export
+#' @rdname pseudo_id
 pseudo_id.default <- function(x) {
-  ux <- unique(x)
-  m <- match(x, na_last(as.character(ux)))
-  attr(m, "uniques") <- ux
-  m
+  ux <- na_last(unique(x))
+  make_pseudo_id(match(x, ux), ux)
 }
 
 #' @export
 #' @rdname pseudo_id
 pseudo_id.factor <- function(x) {
+  x <- fact(x)
+  pseudo_id(fact_coerce_levels(levels(x))[x])
+}
+
+pseudo_id_factor <- function(x) {
+  # This should be used for when the the levels all need to be retained
+  # pseudo_id() only returns values present in x
+  x <- fact(x)
   lvl <- levels(x)
-  m <- seq_along(lvl)[x]
 
-  if (anyNA(m) && !anyNA(lvl)) {
-    lvl <- c(lvl, NA)
-  }
+  # remake to be integers
+  x <- seq_along(lvl)[x]
+  x[is.na(x)] <- length(lvl)
 
-  attr(m, "uniques") <- lvl
-  m
+  # clean up order of new lvls
+  ux <- na_last(lvl[order(match(lvl, lvl[x]))])
+  make_pseudo_id(match(lvl, ux)[x], ux)
+}
+
+
+make_pseudo_id <- function(x, u) {
+  struct(x, class = c("pseudo_id", "integer"), uniques = u)
 }
 
 na_last <- function(x) {
@@ -47,4 +65,15 @@ na_last <- function(x) {
   } else {
     x
   }
+}
+
+.uniques <- function(x) {
+  attr(x, "uniques")
+}
+
+#' @export
+print.pseudo_id <- function(x, ...) {
+  print(as.integer(x))
+  cat("Uniques: ", paste0(.uniques(x), sep = " "), "\n", sep = "")
+  invisible(x)
 }

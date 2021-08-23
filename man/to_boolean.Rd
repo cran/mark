@@ -12,11 +12,11 @@ to_boolean(x, ...)
 
 \method{to_boolean}{logical}(x, ...)
 
-\method{to_boolean}{numeric}(x, true = 1L, false = 0L)
+\method{to_boolean}{numeric}(x, true = 1L, false = 0L, ...)
 
-\method{to_boolean}{character}(x, true = NULL, false = NULL)
+\method{to_boolean}{character}(x, true = NULL, false = NULL, ...)
 
-\method{to_boolean}{factor}(x, true, false)
+\method{to_boolean}{factor}(x, true = NULL, false = NULL, ...)
 }
 \arguments{
 \item{x}{A vector of values}
@@ -28,7 +28,7 @@ to_boolean(x, ...)
 \item{false}{A vector of values to convert to \code{FALSE}}
 }
 \value{
-A logical vector
+A \code{logical} vector of equal length as \code{x}
 }
 \description{
 Convert a vector to boolean/logical

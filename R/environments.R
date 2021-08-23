@@ -16,14 +16,15 @@
 #' * `environments()`: Invisibly, a `character` vector of environment names
 #' @name list_environments
 environments <- function() {
-  s <- search()
+  struct(search(), c("character", "mark_environments"))
+}
 
-  for (e in s) {
-    # TODO update to a print.*() method
+#' @export
+print.mark_environments <- function(x, ...) {
+  for (e in x) {
     cat(utils::str(parent.env(as.environment(e)), give.attr = FALSE))
   }
-
-  invisible(s)
+  invisible(x)
 }
 
 #' @export

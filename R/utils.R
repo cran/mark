@@ -43,8 +43,8 @@ magrittr::`%>%`
     get(name, envir = asNamespace(package)),
     error = function(e) {
       stop(sprintf("`%s` not found in package `%s`",
-                   name, package),
-           call. = FALSE)
+        name, package),
+        call. = FALSE)
     }
   )
 }
@@ -74,8 +74,7 @@ ept <- function(x, envir = parent.frame()) {
 
 # Removes object's attributes before printing
 print_no_attr <- function(x, ...) {
-  attributes(x) <- NULL
-  print(x)
+  print(remove_attributes(x))
 }
 
 #' That
@@ -91,6 +90,7 @@ print_no_attr <- function(x, ...) {
 #' @export
 #' @seealso [base::which()]
 that <- function(x, arr.ind = FALSE, useNames = TRUE) {
+  # TODO consider that() as #seq_along(x)[x]?
   which(x, arr.ind = arr.ind, useNames = useNames)
 }
 
@@ -159,28 +159,83 @@ mark_temp <- function(ext = "") {
     ext <- paste0(".", ext)
   }
 
-  file <- basename(tempfile("", fileext = ext))
-  path <- file_path(mark_dir())
-  dir.create(path, recursive = TRUE, showWarnings = FALSE)
-  file_path(path, file)
+  # Retrieves the outer most function this was called in and save the raw
+  # components to be converted when needed
+  sn <- sys.nframe()
+  oc <- outer_call(sn - 2L)
+  oc <- substr(oc, 1, 40)
+  oc <- collapse0(iconv(oc, toRaw = TRUE)[[1]])
+  oc <- paste0(oc, "__")
+  norm_path(tempfile(oc, fileext = ext))
 }
 
-mark_dir <- function() {
-  R <- getRversion()
-  if (R < 4) {
-    dm <- file_path(tempdir(), "_R_mark_temp_files")
-    dir.create(dm, recursive = TRUE, showWarnings = FALSE)
-    return(dm)
+
+mark_temp_from_raw <- function(x) {
+  splits <- strsplit(x, "/")[[1]]
+  y <- splits[length(splits)]
+  y <- gsub("__.*$", "", y)
+  s <- seq(1, nchar(y) - 1, by = 2)
+  raws <- mapply(substr, x = y, start = s, stop = s + 1L, USE.NAMES = FALSE)
+  wuffle(rawToChar(as.raw(strtoi(raws, base = 16L))))
+}
+
+# foo <- function(...) mark_temp()
+# foobar <- function(...) foo(...)
+# # returns where the function was called from
+# foo(a = 1)
+# x <- foobar(what = this, those = 1)
+# # can retrieve the function from the file name
+# mark_temp_from_raw(x)
+
+check_is_vector <- function(x, mode = "any") {
+  if (isS4(x) | inherits(x, c("data.frame", "matrix", "array")) | !is.vector(remove_attributes(x), mode)) {
+    stop(deparse(substitute(x)), " must be a vector of mode ", mode, call. = FALSE)
+  }
+}
+
+add_attributes <- function(x, ...) {
+  attributes(x) <- c(attributes(x), list(...))
+  x
+}
+
+remove_attributes <- function(x, attr = NULL) {
+  if (is.null(attr)) {
+    attributes(x) <- NULL
+  } else {
+    a <- attributes(x)
+    attributes(x) <- a[names(a) %wo% attr]
+  }
+  x
+}
+
+add_class <- function(x, cl, pos = 1L) {
+  class(x) <- append0(class(x), cl, pos = pos)
+  x
+}
+
+remove_class <- function(x, cl = NULL) {
+  if (is.null(cl)) {
+    class(x) <- NULL
+  } else {
+    class(x) <- class(x) %wo% cl
+  }
+  x
+}
+
+append0 <- function(x, values, pos = NULL) {
+  if (is.null(pos)) {
+    c(x, values)
+  } else if (pos == 1L) {
+    c(values, x)
+  } else {
+    c(x[1L:(pos - 1L)], values, x[pos:length(x)])
+  }
+}
+
+check_interactive <- function() {
+  if (!isFALSE(getOption("mark.check_interactive"))) {
+    return(interactive())
   }
 
-  # Not not available in prior editions
-  rud <- get0("R_user_dir", envir = asNamespace("tools"), mode = "function")
-
-  if (is.null(rud)) {
-    stop("tools::R_user_dir() not found with R ", R)
-  }
-
-  res <- rud("mark")
-  dir.create(res, recursive = TRUE, showWarnings = FALSE)
-  res
+  TRUE
 }

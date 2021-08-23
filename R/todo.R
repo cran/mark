@@ -3,59 +3,92 @@
 #' Search for `#`` TODO` tags
 #'
 #' @details
-#' Calls `git grep -in "[#] TODO"` to find any lines with a comment.
-#' Removes any finds in the NAMESPACE
+#' Calls `git grep -in "[#] TODO"` to find any lines of a `.R` or `.Rmd` file
+#'   with a comment.
 #'
 #' @param pattern A character string containing a regular expression to filter
 #'  for comments after tags; default `NULL` does not filter
+#' @param path The file directory to search for the tags
 #' @param ... Additional parameters passed to `grep` (Except for `pattern`, `x`,
 #'   and `value`)
 #'
-#' @return `NULL` if none are found, otherwise a data.frame with the line
+#' @return `NULL` if none are found, otherwise a `data.frame` with the line
 #'   number, file name, and TODO comment.
 #'
 #' @export
 
-todos <- function(pattern = NULL, ...) {
-  do_todo("todo", pattern = pattern, ...)
+todos <- function(pattern = NULL, path = ".", ...) {
+  do_todo("todo", pattern = pattern, path = path, ...)
 }
 
 #' @rdname todos
 #' @export
-fixmes <- function(pattern = NULL, ...) {
-  do_todo("fixme", pattern = pattern, ...)
+fixmes <- function(pattern = NULL, path = ".", ...) {
+  do_todo("fixme", pattern = pattern, path = path, ...)
 }
 
-do_todo <- function(text, pattern = NULL, ...) {
+do_todo <- function(text, pattern = NULL, path = path, ...) {
   # fs::dir_ls() would be a lot quicker but would be a new dependency
+
+  if (missing(path) || length(path) != 1 || !is.character(path)) {
+    stop("path must be a character vector of length 1L", call. = FALSE)
+  }
+
+  if (!file.exists(path)) {
+    stop("path not found: ", path, call. = FALSE)
+  }
+
   if (length(text) != 1L) {
     stop("Length of text must be 1", call. = FALSE)
   }
 
-  files <- list.files(pattern = "\\.r(md)?$", recursive = TRUE, ignore.case = TRUE)
-  file_list <- lapply(files, readLines, warn = FALSE)
+  files <- if (is_dir(path)) {
+    list.files(
+      path,
+      pattern = "\\.r(md)?$",
+      recursive = TRUE,
+      ignore.case = TRUE,
+      full.names = TRUE
+    )
+  } else {
+    if (!grepl(path, pattern = "\\.r(md)?$", ignore.case = TRUE)) {
+      stop("path is not a .R or .Rmd file", .call = FALSE)
+    }
+    path
+  }
+
   finds <- lapply(
-    file_list,
-    function(x)  {
+    lapply(files, readLines, warn = FALSE),
+    function(x) {
       ind <- grep(
         pattern = sprintf("[#]\\s+%s[:]?\\s+", toupper(text)),
         x = x
       )
-      quick_df(list(ind = ind, todo = x[ind]))
+      quick_dfl(ind = ind, todo = x[ind])
     }
   )
+
+  # names(finds) <- substr(files, path_n, vap_int(files, nchar))
   names(finds) <- files
-  ind <- vap_lgl(finds, function(x) nrow(x) > 0)
-  finds <- finds[ind]
+  finds <- finds[vap_int(finds, nrow) > 0L]
 
   if (identical(remove_names(finds), list())) {
     message("No todos found")
     return(invisible(NULL))
   }
 
-  out <- cbind(rep(names(finds), vap_int(finds, nrow)), Reduce(rbind, finds))
-  names(out) <- c("file", "line", text)
-  out <- out[, c("line", "file", text)]
+  out <- quick_df(c(
+    file = list(rep(names(finds), vap_int(finds, nrow))),
+    set_names0(as.list(Reduce(rbind, finds)), c("line", text))
+  ))[, c("line", "file", text)]
+
+  ind <- grepl("\\.rmd$", out[["file"]], ignore.case = TRUE)
+
+  if (any(ind)) {
+    # quick fix for Rmd files
+    out[[text]][ind] <- gsub("^(<!--)\\s?|\\s?(-->)$", "", out[[text]][ind])
+  }
+
   out[[text]] <- sub(
     sprintf("^[ #]*\\s+%s[:]?\\s+", toupper(text)),
     "",
@@ -64,6 +97,7 @@ do_todo <- function(text, pattern = NULL, ...) {
 
   if (!is.null(pattern)) {
     out <- out[grep(pattern, out[[text]], value = FALSE, ...), ]
+    attr(out, "row.names") <- seq_along(attr(out, "row.names"))
   }
 
   if (nrow(out) == 0L) {
@@ -71,17 +105,15 @@ do_todo <- function(text, pattern = NULL, ...) {
     return(invisible(NULL))
   }
 
-  class(out) <- c("todos_df", "data.frame")
-  attr(out, "todos_type") <- text
-  out
+  struct(out, c("todos_df", "data.frame"), todos_type = text, .keep_attr = TRUE)
 }
 
-#' @exportS3Method
+#' @export
 print.todos_df <- function(x, ...) {
   # TODO Add a limit for number of TODOs to show?
   type <- attr(x, "todos_type")
 
-  n <- max(nchar(x[["line"]]))
+  n <- max(nchar(x[["line"]]), 0)
   w <- getOption("width") - n - 3 # 4??
   pad <- collapse0(rep(" ", n + 3))
   pat <- sprintf("[%%%i.i]", n)

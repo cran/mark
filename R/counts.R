@@ -14,9 +14,10 @@
 #'
 #' @param x A vector or `data.frame`
 #' @param ... Arguments passed to other methods
-#' @param sort Logical, if `TRUE` will sort values before returning. For factors
-#'   this will sort by factor levels.  This has no effect for logical vectors,
-#'   which already return in the order of `FALSE`, `TRUE`, `NA`.
+#' @param sort Logical, if `TRUE` will sort values (not counts) before
+#'   returning. For factors this will sort by factor levels.  This has no effect
+#'   for logical vectors, which already return in the order of `FALSE`, `TRUE`,
+#'   `NA`.
 #' @param cols A vector of column names or indexes
 #'
 #' @return A named vector of `integer`s or `double`s (for `counts`, and `props`,
@@ -45,18 +46,29 @@ counts <- function(x, ...) {
 
 #' @export
 counts.default <- function(x, sort = FALSE, ...) {
-  id <- pseudo_id(x)
-  tab <- tabulate(id)
-  u <- attr(id, "uniques")
-  out <- integer(length(u))
-  out[seq_along(tab)] <- tab
+  x <- pseudo_id(x)
+  u <- .uniques(x)
+  out <- tabulate(x, length(u))
   names(out) <- na_last(u)
 
   if (sort) {
-    return(sort_by(out, names(out)))
+    return(sort_names(out, numeric = is.numeric(x)))
   }
 
   out
+}
+
+
+# x <- structure(c(2L, NA, 3L, NA, NA, 3L, NA, NA, 1L, 1L), .Label = c("2", "4", "1", "0"), class = "factor")
+
+#' @export
+counts.factor <- function(x, ...) {
+  x <- fact(x)
+  lvl <- levels(x)
+  x <- seq_along(lvl)[x]
+  n <- length(lvl)
+  x[is.na(x)] <- n
+  set_names0(tabulate(x, n), lvl)
 }
 
 #' @export
@@ -84,8 +96,9 @@ counts.data.frame <- function(x, cols, sort = FALSE, ..., .name = "freq") {
 
   if (is.factor(x[[cols]])) {
     out[[1]] <- fact(out[[1]])
-    if (is.ordered(out[[1]])) {
-      class(out[[1]]) <- c("ordered", "factor")
+
+    if (is.ordered(x[[cols]])) {
+      out[[1]] <- as_ordered(out[[1]])
     }
   }
 
@@ -100,8 +113,8 @@ props <- function(x, ...) {
 
 #' @rdname counts
 #' @export
-props.default <- function(x, ...) {
-  counts(x) / length(x)
+props.default <- function(x, sort = FALSE, ...) {
+  counts(x, sort = sort) / length(x)
 }
 
 #' @rdname counts
@@ -140,7 +153,6 @@ counts_n <- function(x, name = "freq", sort = FALSE) {
   cn <- colnames(x)
   colnames(out) <- cn
 
-  # TODO add warning
   name <- name %||% "freq"
 
   i <- 0L

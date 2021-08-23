@@ -1,7 +1,9 @@
 test_that("clipboard", {
   skip_if_not(is_windows(), "Is Windows?")
-  skip_if(any(has_warning(integer(1e4), readClipboard)),
-          "Failed to access clipboard")
+  skip_if(
+    any(has_warning(integer(1e4), readClipboard)),
+    "Failed to access clipboard"
+  )
 
   clear_clipboard()
 
@@ -16,12 +18,11 @@ test_that("clipboard", {
   test_clipboard(as.Date("2020-01-02") + 0:4)
   test_clipboard(runif(1e6))
 
-  x <- data.frame(
+  x <- quick_dfl(
     var1 = 1:3,
     var2 = letters[1:3],
     var3 = as.Date("2020-01-03") + 1:3,
-    var4 = c(TRUE, FALSE, NA),
-    stringsAsFactors = FALSE
+    var4 = c(TRUE, FALSE, NA)
   )
 
   expect_error(write_clipboard(x), NA)
@@ -33,11 +34,11 @@ test_that("clipboard", {
 })
 
 test_that("try_vectors_formats()", {
-  xchr <- c("this", "that", "121", "them", ".011", "2020", "NA")
+  xchr <- c("this", "that", NA, "121", "them", ".011", "2020", "NA")
   xdbl <- c("-0.10", "  .10123", "-.102010000  ", "NaN")
-  xint <- c("121021", "-12191", "121001")
+  xint <- c("121021", "-12191", "121001", "  ")
   xdat <- c("2020-05-01", "1900-10-10", "1655-06-07")
-  xlgl <- c("TRUE", "true", "FALSE", "fALSE", "na", "NA")
+  xlgl <- c("TRUE", "  true", "FALSE", "fALSE", "na", "NA")
   rchr <- xchr
   rdbl <- as.double(xdbl)
   rint <- as.integer(xint)

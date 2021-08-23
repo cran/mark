@@ -1,3 +1,56 @@
+# mark 0.2.0
+
+## Changes
+
+* `package_available()` now visibly returns `TRUE`/`FALSE`
+* `remove_na()` now has methods for `list`s and `factor`s
+* `environments()` now has it's own `print.mark_environments()` method rather than calling `cat()` within the function itself
+* `array_extract()`'s first argument is changed from `arr` to `.arr`
+* `diff_time()` now defaults to using UTC (Related to [#32](https://github.com/jmbarbone/mark/issues/32))
+* `print.note()` method has been updated (Related to: [#33](https://github.com/jmbarbone/mark/issues/33)):
+  * to print `x` _normally_, without the `note class` when just the note has to be seen
+  * an internal function now handles the note formatted for class `noted`
+* changes to `fact()`
+  * `fact()` now returns a vector with a `fact` element
+  * `fact.character()` correctly labels `NA`s [#24](https://github.com/jmbarbone/mark/issues/24)
+  * `fact.factor()` not longer simply returns `x` but rather updates the levels and integer values to confirm with other `fact()` methods.  `fact.factor()` will retain all levels of the original value, reorder the levels, and append `NA` if necessary
+  * `fact.fact()` added to return a correctly formatted `fact()`
+  * `fact.logical()` now orders levels as `TRUE` then `FALSE`, and `NA` if present
+  * `fact.Date()` and `fact.POSIXt()` added, which simply call `fact.numeric()`
+  * `print.fact()` method added to print a `fact` vector as a `factor`
+  * `as_ordered.factor()` and `as_ordered.ordered()` now call `fact()` to check levels 
+
+## Fixes
+
+* functions that check if an argument is a vector no long use `is.vector()` directly; arguments passed with attributes that when removed fulfill `is.vector()` are accepted
+* `todos()` and `fixmes()` now correctly show tags for `.Rmd` files
+* correction to error message in `limit()`
+* adds missing `sort` argument to `props()`
+* `pseudo_id.factor()` no longer returns `NA_integer` when a value is `NA` or a level is `NA` and correctly resets the order of the levels from the factor to their order of appearance
+* `flip.data.frame()` no longer coerces single column data.frames [#36](https://github.com/jmbarbone/mark/issues/36)
+
+## New features
+
+* `fact.pseudo_id()` and `pseudo_id.pseudo_id()` methods added
+* adds `as_ordered()` to quickly create `ordered` factors using `fact()`
+* adds `char2fact()` to convert `character` vectors (or columns in a `data.frame`) to `factors` based on the number unique values
+* adds `tableNA()` to make a table from `NA` values
+* `round_by()` gains an additional argument `include0` which if `FALSE` will replace `0` values with `by`
+* `assign_labels.data.frame()` gains an additional argument `.missing` to set how to control for missing labels: you can now use a `warning` for a missing label (instead of an error) or silently ignore any missing labels
+* `sort_names()` gains a new argument `numeric` to try to sort names of `x` by their numeric value [#26](https://github.com/jmbarbone/mark/issues/26)
+* adds `struct()`, a simplified version of `struct()`
+* adds more `fact()` methods
+  * `fact.integer()` [#30](https://github.com/jmbarbone/mark/issues/30)
+  * `fact.haven_labelled()` [#31](https://github.com/jmbarbone/mark/issues/31)
+* `todos()` and `fixmes()` gain an additional argument `path` to specify a directory or file to search within [#25](https://github.com/jmbarbone/mark/issues/25)
+* `print.pseudo_id()` added for a cleaner print
+* `between_more()` accepts vectors for `left` and `right` params
+
+## Non visible changes
+
+* code coverage added
+* additional tests added
+
 # mark 0.1.4
 
 * no visible user changes
@@ -42,7 +95,7 @@ The previous name `jordan` was conflicting with recent package on CRAN.
   * removes `jordan.note.fun` option for printing -- this was too complicated and doesn't seem to work too well without too many adjustments
   * `note<-` now appends the class `noted` to the object so that a `print.noted` method is dispatched so the note will be printed when called
   * `print.note` note defaults to a colorful _message_ called with `cat()`
-  * Startup related functions moved to [`jordanExtra`](https://github.com/jmbarbone/jordanExtra); these were a bit _wild_, dynamic, and not well tested.  The **.Rprofile** template also exists in the separate package.
+  * Startup related functions moved to [`jordanExtra`](https://github.com/jmbarbone/markExtra); these were a bit _wild_, dynamic, and not well tested.  The **.Rprofile** template also exists in the separate package.
 
 ## Improvements
 
@@ -155,7 +208,7 @@ Major cleanup for documenting, reviewing, removing, relocating, and testing func
 
 ## Moved to `jordanExtra`
 
-Some miscellaneous, less controlled functions have been moved to [jordanExtra](https://github.com/jmbarbone/jordanExtra).
+Some miscellaneous, less controlled functions have been moved to [jordanExtra](https://github.com/jmbarbone/markExtra).
 
 * Functions for Rust `set_rust_engine()`, `engine_rust()`
 * Functions for [openxlsx](https://github.com/ycphs/openxlsx): `add_data_sheet()`, `add_image_sheet()`

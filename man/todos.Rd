@@ -5,25 +5,27 @@
 \alias{fixmes}
 \title{Get TODOs}
 \usage{
-todos(pattern = NULL, ...)
+todos(pattern = NULL, path = ".", ...)
 
-fixmes(pattern = NULL, ...)
+fixmes(pattern = NULL, path = ".", ...)
 }
 \arguments{
 \item{pattern}{A character string containing a regular expression to filter
 for comments after tags; default \code{NULL} does not filter}
 
+\item{path}{The file directory to search for the tags}
+
 \item{...}{Additional parameters passed to \code{grep} (Except for \code{pattern}, \code{x},
 and \code{value})}
 }
 \value{
-\code{NULL} if none are found, otherwise a data.frame with the line
+\code{NULL} if none are found, otherwise a \code{data.frame} with the line
 number, file name, and TODO comment.
 }
 \description{
 Search for \verb{#`` TODO} tags
 }
 \details{
-Calls \verb{git grep -in "[#] TODO"} to find any lines with a comment.
-Removes any finds in the NAMESPACE
+Calls \verb{git grep -in "[#] TODO"} to find any lines of a \code{.R} or \code{.Rmd} file
+with a comment.
 }

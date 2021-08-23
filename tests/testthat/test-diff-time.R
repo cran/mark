@@ -16,15 +16,15 @@ tz1 <- c(
 )
 
 tz2 <- c(
-    2,
-    3,
-    6,
-    8,
+  2,
+  3,
+  6,
+  8,
   -10,
   -11,
-   12,
+  12,
   -13,
-   16,
+  16,
   -17,
   NULL
 )
@@ -51,7 +51,7 @@ test_that("diff_time_*() identical to difftime()", {
     ignore_attr = TRUE
   )
 
-   expect_identical(
+  expect_identical(
     with(df, difftime(b, a, units = "hours")),
     with(df, diff_time_hours(a, b)),
     ignore_attr = TRUE
@@ -74,13 +74,13 @@ test_that("Timezones", {
 
   st <- as.POSIXct("2021-04-06 11:12:45", tz = "US/Central")
 
-  dftz <- quick_df(list(
+  dftz <- quick_dfl(
     a = rep(st, 4),
     b = rep(st, 4),
     tza = c("GMT", "UTC", "US/Eastern", "NZ"),
     tzb = c("GMT", "Africa/Casablanca", "US/Central", "CET"),
     tzn = c(0, 1, -1, 6) * 3600
-  ))
+  )
 
   # No difference
   expect_identical(
@@ -100,8 +100,38 @@ test_that("Timezones", {
   )
 
   expect_equal(
+    as.double(with(dftz, diff_time_years(a, b, tza, tzb))),
+    as.double(with(dftz, diff_time_dyears(a, b, tza, tzb)))
+  )
+
+  expect_equal(
+    as.double(with(dftz, diff_time_dyears(a, b, tza, tzb))),
+    as.double(with(dftz, diff_time_days(a, b, tza, tzb)) / 365)
+  )
+
+  expect_equal(
+    as.double(with(dftz, diff_time_wyears(a, b, tza, tzb))),
+    as.double(with(dftz, diff_time_weeks(a, b, tza, tzb)) / 52)
+  )
+
+  expect_equal(
+    as.double(with(dftz, diff_time_myears(a, b, tza, tzb))),
+    as.double(with(dftz, diff_time_months(a, b, tza, tzb)) / 12)
+  )
+
+  expect_equal(
+    as.double(with(dftz, diff_time_years(a, b))),
+    as.double(with(dftz, diff_time_dyears(a, b)))
+  )
+
+  expect_equal(
     with(dftz, diff_time_hours(a, b)),
     with(dftz, diff_time_hours(a, b, -3600, -3600))
+  )
+
+  expect_equal(
+    as.double(with(dftz, diff_time_months(a, b, tza, tzb))),
+    as.double(with(dftz, diff_time_days(a, b, tza, tzb)) / 30)
   )
 
   # Off sets are by the hour
@@ -132,6 +162,11 @@ test_that("Timezones", {
     c(0, 1, -1, -10),
     ignore_attr = TRUE
   )
+
+  expect_warning(
+    diff_time(Sys.Date(), Sys.Date(), tzx = NA, tzy = "GMT"),
+    "NA found in timezones"
+  )
 })
 
 test_that("Error checking", {
@@ -144,4 +179,70 @@ test_that("Error checking", {
     c(0, NA, 0, 0),
     ignore_attr = TRUE
   )
+})
+
+test_that("class coehersion", {
+
+  expect_identical(
+    diff_time(as.Date("2021-07-26"), "2021-07-26"),
+    diff_time(as.Date("2021-07-26"), as.Date("2021-07-26"))
+  )
+
+  expect_identical(
+    diff_time(as.Date("2021-07-26"), "2021-07-26"),
+    # setting to date instead
+    diff_time(as.Date("2021-07-26"), as.POSIXct("2021-07-26 02:02:02"))
+  )
+
+  # skip_if_not_installed("withr")
+  # withr::local_timezone("UTC")
+
+  expect_identical(
+    extract_numeric_time("2021-01-01", NULL),
+    struct(1609459200, "double", tzone = "UTC")
+  )
+
+  expect_warning(
+    to_numeric_with_tz("2021-01-01", NA),
+    "NA found in timezones"
+  )
+
+  expect_identical(
+    extract_numeric_time(as.POSIXlt("2021-01-01", tz = "UTC"), NULL),
+    struct(1609459200, "double", tzone = "UTC")
+  )
+
+  expect_identical(check_tz(NULL), NULL)
+  expect_identical(check_tz(c("UTC", "UTC")), NULL)
+})
+
+
+# helpers -----------------------------------------------------------------
+
+test_that("helpers", {
+  expect_true(is_POSIXct(as.POSIXct("2021-08-24")))
+  expect_true(is_POSIXlt(as.POSIXlt("2021-08-24")))
+  expect_true(is_diff_time(diff_time(Sys.time(), Sys.time() + 1)))
+})
+
+
+# printing ----------------------------------------------------------------
+
+test_that("snaps", {
+  skip("not currently testing snaps")
+
+  x <- struct(18842L, "Date")
+  y <- x + 100L
+
+  expect_snapshot(diff_time(x, y))
+  expect_snapshot(diff_time_days(x, y))
+  expect_snapshot(diff_time_dyears(x, y))
+  expect_snapshot(diff_time_hours(x, y))
+  expect_snapshot(diff_time_mins(x, y))
+  expect_snapshot(diff_time_months(x, y))
+  expect_snapshot(diff_time_myears(x, y))
+  expect_snapshot(diff_time_secs(x, y))
+  expect_snapshot(diff_time_weeks(x, y))
+  expect_snapshot(diff_time_wyears(x, y))
+  expect_snapshot(diff_time_years(x, y))
 })
