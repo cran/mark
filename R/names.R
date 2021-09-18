@@ -29,12 +29,13 @@ sort_names <- function(x, numeric = FALSE) {
 #' @param x A vector of values
 #' @param nm A vector of names
 #' @return
-#' * `set_names0()`: `x` with `nm` values assigned to names
+#' * `set_names0()`: `x` with `nm` values assigned to names (if `x` is `NULL`, `NULL` is returned)
 #' * `remove_names()`: `x` without names
 #' * `names_switch()`: `character` vector of equal length `x` where names and values are switched
 #'
 #' @export
 set_names0 <- function(x, nm = x) {
+  if (is.null(x)) return(NULL)
   `names<-`(x, nm)
 }
 
@@ -49,4 +50,10 @@ remove_names <- function(x) {
 names_switch <- function(x) {
   nm <- names(x) %||% stop("x must be named", call. = FALSE)
   set_names0(nm, as.vector(x, "character"))
+}
+
+#' @rdname set_names0
+#' @export
+`%names%` <- function(x, nm) {
+  set_names0(x, nm)
 }

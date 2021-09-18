@@ -1,3 +1,6 @@
+
+# fact.logical() ----
+
 test_that("fact.logical() works", {
   x <- fact(c(TRUE, FALSE, NA))
   expect_message(capture.output(print(x)), NA)
@@ -8,6 +11,8 @@ test_that("fact.logical() works", {
 
   expect_false(anyNA(x))
 })
+
+# fact.pseudo_id() ----
 
 test_that("fact.pseudo_id() works", {
   expect_message(capture.output(print(fact(pseudo_id(c("a", "a", "b", NA_character_))))), NA)
@@ -33,12 +38,16 @@ test_that("fact.pseudo_id() works", {
   expect_identical(o, 1:4)
 })
 
+# fact.integer() ----
+
 test_that("fact.integer() works", {
   expect_equal(
     fact(struct(1L, c("foo", "integer"))),
     make_fact(1L, levels = "1")
   )
 })
+
+# fact.factor() ----
 
 test_that("fact.factor() works", {
   # x <- fact(as.character(c(Sys.Date() + 5:1, NA))[sample(1:6, 20, TRUE)])
@@ -62,11 +71,22 @@ test_that("fact.factor() works", {
   x <- factor(c(1, NA, 2), levels = c(2, NA, 1), exclude = NULL)
   res <- make_fact(c(1L, 3L, 2L), levels = c("1", "2", NA_character_))
   expect_identical(fact(x), res)
+
+  x <- factor(c(NA, TRUE, FALSE))
+  res <- make_fact(c(3L, 1L, 2L), levels = c(TRUE, FALSE, NA))
+  expect_identical(fact(x), res)
+
+  x <- factor(c(NA, TRUE, FALSE), exclude = NULL)
+  res <- make_fact(c(3L, 1L, 2L), levels = c(TRUE, FALSE, NA))
+  expect_identical(fact(x), res)
 })
+
+# fact.haven_labelled() ----
 
 test_that("fact.haven_labelled() works", {
   skip_if_not_installed("haven")
-  haven_as_factor <- "haven" %colons% "as_factor.haven_labelled"
+  .haven_as_factor <- "haven" %colons% "as_factor.haven_labelled"
+  haven_as_factor <- function(...) add_class(.haven_as_factor(...), "fact", 1L)
 
   # Integers
   r <- rep(1:3, 2)
@@ -92,6 +112,8 @@ test_that("fact.haven_labelled() works", {
   expect_identical(fact(x), haven_as_factor(x))
 })
 
+# nas ----
+
 test_that("fact() correctly labels NAs [#24]", {
   expect_equal(
     fact(c(NA, "a", "b")),
@@ -112,4 +134,38 @@ test_that("fact() correctly labels NAs [#24]", {
     fact(c(TRUE, TRUE, NA, FALSE, TRUE)),
     make_fact(c(1L, 1L, 3L, 2L, 1L), c("TRUE", "FALSE", NA))
   )
+})
+
+
+# ordering ----
+
+test_that("as_ordered() works", {
+  x <- fact(c(1:3, NA_integer_))
+  res <- struct(
+    c(1:3, NA_integer_),
+    c("fact", "ordered", "factor"),
+    levels = as.character(1:3)
+  )
+  expect_identical(as_ordered(x), res)
+})
+
+
+# other -------------------------------------------------------------------
+
+
+test_that("fact.default() fails", {
+  expect_error(fact(struct(NULL, "foo")))
+})
+
+test_that("fact_coerce_levels() works", {
+  x <- as.Date("2021-09-03") + 0:2
+  expect_equal(fact_coerce_levels(as.character(x)), x)
+
+  # Be careful about setting a time zone
+  # Not very good for dealing with local
+  x <- as.POSIXlt("2021-09-03", tz = "UTC") + 0:2
+  expect_equal(fact_coerce_levels(as.character(x)), x)
+
+  x <- as.POSIXlt("2021-09-03", tz = "UTC") + 0:2
+  expect_equal(fact_coerce_levels(as.character(x)), x)
 })

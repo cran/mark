@@ -209,6 +209,8 @@ smallest_file <- function(x) {
 #'   [base::list.dirs()] with preferred defaults and pattern searching on the
 #'   full file path.
 #'
+#' `file_open` is simply an alias.
+#'
 #' @inheritParams norm_path
 #' @inheritParams base::list.files
 #' @param ignore_case logical. Should pattern-matching be case-insensitive?
@@ -232,10 +234,14 @@ open_file <- function(x) {
   out
 }
 
+#' @export
+#' @rdname file_utils
+file_open <- open_file
+
 #' @rdname file_utils
 #' @export
 shell_exec <- function(x) {
-  invisible(vapply(x, try_shell_exec, logical(1), USE.NAMES = FALSE))
+  invisible(vap_lgl(x, try_shell_exec))
 }
 
 try_shell_exec <- function(x) {
@@ -251,14 +257,36 @@ try_shell_exec <- function(x) {
 
 #' @rdname file_utils
 #' @export
-list_files <- function(x = ".", pattern = NULL, ignore_case = FALSE, all = FALSE, negate = FALSE, basename = FALSE) {
+list_files <- function(
+  x = ".",
+  pattern = NULL,
+  ignore_case = FALSE,
+  all = FALSE,
+  negate = FALSE,
+  basename = FALSE
+) {
+
   path <- norm_path(x, check = TRUE)
 
   if (length(path) == 1L && is.na(path)) {
     return(NA_character_)
   }
 
-  files <- norm_path(
+  files <- if (basename && !negate) {
+    # default behavior
+    list.files(
+      path         = path,
+      pattern      = pattern,
+      all.files    = all,
+      full.names   = TRUE,
+      recursive    = all,
+      ignore.case  = ignore_case,
+      include.dirs = FALSE,
+      no..         = TRUE
+    )
+  } else {
+    # If we want the regular expression applied to the entire file
+    # Or if we want to negate the expression
     list.files(
       path         = path,
       pattern      = NULL,
@@ -269,8 +297,9 @@ list_files <- function(x = ".", pattern = NULL, ignore_case = FALSE, all = FALSE
       include.dirs = FALSE,
       no..         = FALSE
     )
-  )
+  }
 
+  files <- norm_path(files)
   files <- files[is_file(files)]
 
   if (is.null(pattern)) {
@@ -395,7 +424,10 @@ file_name <- function(x, compression = FALSE) {
 #'
 #' @param x A vector of files
 #' @param ts A single timestamp or vector of timestamps (default: `Sys.time()`)
-#' @param format A format to be applied to the times; set to `NULL` to skip formatting
+#' @param format A format to be applied to the times; set to `NULL` to skip
+#'   formatting
+#' @param sep A `character` vector of length 1 to separate the timestamp from
+#'   the file name
 #' @return The full name paths with the appended time stamp
 #' @export
 #' @examples
@@ -406,11 +438,18 @@ file_name <- function(x, compression = FALSE) {
 #' add_file_timestamp(file2)
 #'
 #' file.remove(file1, file2)
-add_file_timestamp <- function(x, ts = Sys.time(), format = "%Y-%m-%d %H%M%S") {
+add_file_timestamp <- function(x, ts = Sys.time(), format = "%Y-%m-%d %H%M%S", sep = " ") {
   if (!is.null(format)) {
     ts <- format(ts, format = format)
   }
+
   bn <- file_name(x)
   ext <- tools::file_ext(x)
-  file.path(dirname(x), paste0(bn, " ", ts, if (ext != "") ".", ext))
+
+  if (length(sep) > 1) {
+    warning("sep collapsed", call. = FALSE)
+    sep <- collapse0(sep)
+  }
+
+  file.path(dirname(x), paste0(bn, sep, ts, if (ext != "") ".", ext))
 }

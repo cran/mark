@@ -19,7 +19,7 @@ assign_labels(x, ...)
 
 \method{assign_labels}{default}(x, label, ...)
 
-\method{assign_labels}{data.frame}(x, ..., .missing = c("error", "warn", "skip"))
+\method{assign_labels}{data.frame}(x, ..., .missing = c("error", "warn", "skip"), .ls = list(...))
 
 assign_label(x, ...)
 
@@ -50,6 +50,8 @@ column is the targeted colname and the second is the desired label.}
 can be set to \code{error} to \code{stop()} the call, \code{warn} to provide a warning, or
 \code{skip} to silently skip those labels.}
 
+\item{.ls}{A named list of columns and labels to be set if \code{...} is empty}
+
 \item{title}{Title for the viewer window -- if not supplemented will show as
 \code{paste0(as.character(substitute(x)), " - Labels")}}
 
@@ -69,12 +71,14 @@ inside and will retrieve the labels and show them in the viewer as a
 data.frame.
 }
 \examples{
-labs <- assign_label(iris,
-                     Sepal.Length = "cms",
-                     Sepal.Width  = "cms",
-                     Petal.Length = "cms",
-                     Petal.Width  = "cms",
-                     Species      = "Iris ...")
+labs <- assign_labels(
+  iris,
+  Sepal.Length = "cms",
+  Sepal.Width  = "cms",
+  Petal.Length = "cms",
+  Petal.Width  = "cms",
+  Species      = "Iris ..."
+)
 
 labs$dummy <- ""
 get_labels(labs) # shows label as <NA> for dummy column

@@ -1,3 +1,31 @@
+# mark 0.3.0
+
+## Fixes
+
+* `fact.haven_labelled()` now returns an object with class `fact` [#39](https://github.com/jmbarbone/mark/issues/39); performance enhancements
+* `set_names0(NULL)` no longer causes an error and returns `NULL` [#40](https://github.com/jmbarbone/mark/issues/40)
+* `diff_time()` correctly handles time zones when `x` is `Date` and `y` is `POSIXt` [#41](https://github.com/jmbarbone/mark/issues/41)
+
+## Changes
+
+* updates file path finding functions (e.g., `list_files()`) to try to not search every file depending on desired searches (e.g., by full file paths or just base names)
+* `as_ordered()` handles `factors` better; S3 methods removed: `as_ordered.ordered()`, `as_ordered.factor()`
+* `remove_na()` has better performance when `x` has no `NA` values
+* `counts.data.frame()` and `props.data.frame()` retain attributes of selected columns
+* `todos()` and `fixmes()` will not search for `.R` or `.Rmd` files if the `path` is not changed from `""` and no `.Rproj` is found within the directory
+
+## New features
+
+* adds `unlist0()` to retain original names of lists
+* adds `%names%` for a fun way to set names
+* adds `file_open()` as alias for `open_file()`
+* adds `detail()` to return a `data.frame` of details for a vector of columns of a `data.frame`
+* adds `squash_vec()` to combined the names of a vector with repeated values
+* adds `make_sf()` as a simple wrapper for package specific `system.file()`
+* `add_file_timestampe()` gains a new parameter `sep` to separate the file name (sans ext) and the time stamp
+* `assign_labels.data.frame()` gains new argument `.ls` to explicitly set a `list` (or `data.frame`) of columns
+* `props()` and family gain argument `na.rm` to not count `NA` values for proportions
+
 # mark 0.2.0
 
 ## Changes
@@ -18,7 +46,7 @@
   * `fact.logical()` now orders levels as `TRUE` then `FALSE`, and `NA` if present
   * `fact.Date()` and `fact.POSIXt()` added, which simply call `fact.numeric()`
   * `print.fact()` method added to print a `fact` vector as a `factor`
-  * `as_ordered.factor()` and `as_ordered.ordered()` now call `fact()` to check levels 
+  * `as_ordered.factor()` and `as_ordered.ordered()` now call `fact()` to check levels
 
 ## Fixes
 

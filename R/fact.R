@@ -35,7 +35,7 @@ fact <- function(x) {
 #' @export
 fact.default <- function(x) {
   stop("No fact method for class(es) ", collapse0(class(x), sep = ", "),
-       call. = FALSE)
+    call. = FALSE)
 }
 
 #' @rdname fact
@@ -83,7 +83,7 @@ fact.factor <- function(x) {
 
   if (is.logical(new_levels)) {
     m <- match(new_levels[x], c(TRUE, FALSE, NA))
-    res <- make_fact(m, c("TRUE", "FALSE", if (anyNA(new_levels)) NA_character_))
+    res <- make_fact(m, c("TRUE", "FALSE", if (anyNA(new_levels[x])) NA_character_))
     return(res)
   }
 
@@ -116,7 +116,6 @@ fact.factor <- function(x) {
   make_fact(m, new_levels, is.ordered(x))
 }
 
-
 #' @rdname fact
 #' @export
 fact.fact <- function(x) {
@@ -145,7 +144,8 @@ fact.pseudo_id <- function(x) {
 fact.haven_labelled <- function(x) {
   require_namespace("haven")
   labels <- sort(attr(x, "labels", exact = TRUE))
-  u <- unique(unclass(x))
+  uc <- unclass(x)
+  u <- unique(uc)
   m <- match(u, labels)
   nas <- is.na(m)
 
@@ -154,11 +154,14 @@ fact.haven_labelled <- function(x) {
     labels <- labels[m]
     labels[nas] <- u[nas]
     names(labels)[nas] <- u[nas]
+    mx <- match(x, labels)
+  } else {
+    mx <- as.integer(x)
   }
 
   struct(
-    match(x, labels),
-    class = "factor",
+    mx,
+    class = c("fact", "factor"),
     levels = names(labels),
     label = attr(x, "label", exact = TRUE)
   )
@@ -184,30 +187,35 @@ print.fact <- function(x, ...) {
 #'   returned.  If `x` is a `factor` the `ordered` class is added.  Otherwise,
 #'   `x` is made into a `factor` with [mark::fact()] and then the `ordered`
 #'   class is added.
+#'   Unlike just `fact`, `ordered` will replace the `NA` levels with `NA_integer_` to work appropriately with other functions.
 #'
 #' @inheritParams fact
 #' @export
 #' @returns An `ordered` vector
+#' @examples
+#' x <- c("a", NA, "b")
+#' x <- fact(x)
+#' str(x) # NA is 3L
+#'
+#' y <- x
+#' class(y) <- c("ordered", class(y))
+#' max(y)
+#' max(y, na.rm = TRUE) # returns NA -- bad
+#'
+#' # as_ordered() removes the NA level
+#' x <- as_ordered(x)
+#' str(x)
+#' max(x, na.rm = TRUE) # returns b -- correct
+
 as_ordered <- function(x) {
   UseMethod("as_ordered", x)
 }
 
+
 #' @rdname as_ordered
 #' @export
 as_ordered.default <- function(x) {
-  as_ordered(fact(x))
-}
-
-#' @rdname as_ordered
-#' @export
-as_ordered.factor <- function(x) {
-  add_class(fact(x), "ordered", 2L)
-}
-
-#' @rdname as_ordered
-#' @export
-as_ordered.ordered <- function(x) {
-  fact(x) # fact retains ordered
+  add_class(fact_remove_na(x), "ordered", 2L)
 }
 
 
@@ -222,11 +230,17 @@ make_fact <- function(x, levels, ordered = FALSE) {
 }
 
 fact_remove_na <- function(x) {
-  if (!is.factor(x)) {
-    stop("x must be a factor")
+  x <- fact(x)
+  out <- unclass(x)
+  lvl <- levels(out)
+  w <- which(is.na(lvl))
+
+  if (!length(w)) {
+    return(x)
   }
 
-  make_fact(x, remove_na(levels(x)))
+  out[out == w] <- NA_integer_
+  make_fact(out, levels = lvl[-w])
 }
 
 try_numeric <- function(x) {
@@ -250,6 +264,7 @@ try_numeric <- function(x) {
   nums
 }
 
+
 fact_coerce_levels <- function(x) {
   nas <- is.na(x)
 
@@ -257,18 +272,34 @@ fact_coerce_levels <- function(x) {
     return(as.logical(x))
   }
 
+  tz <- getOption("mark.default_tz", "UTC")
   numbers <- wuffle(as.numeric(x[!nas]))
   dates <- wuffle(as.Date(x[!nas], optional = TRUE))
-  posix <- wuffle(as.POSIXlt(x[!nas], tz = getOption("mark.default_tz", "UTC"), optional = TRUE))
+  posix <- wuffle(as.POSIXct(
+    x          = x[!nas],
+    tryFormats = try_formats(),
+    tz         = tz,
+    optional   = TRUE
+  ))
 
   n <- length(x)
 
-  if (!anyNA(posix)) {
-    x <- rep(NA_POSIXlt_, n)
-    x[!nas] <- posix
-  } else if (!anyNA(dates)) {
+  if (!anyNA(dates) && all(nchar(x[!nas]) == 10L)) {
     x <- rep(NA_Date_, n)
     x[!nas] <- dates
+  } else if (!anyNA(posix)) {
+    x <- rep(NA_real_, n)
+
+    if (any(nas)) {
+      x[!nas] <- as.double(posix)
+    } else {
+      x[] <- as.double(posix)
+    }
+    x <- as.POSIXct(
+      x          = x,
+      origin     = "1970-01-01",
+      tz         = tz
+    )
   } else if (!anyNA(numbers)) {
     x <- rep(NA_real_, n)
     x[!nas] <- numbers
@@ -277,11 +308,6 @@ fact_coerce_levels <- function(x) {
   x
 }
 
-# x <- factor(c("a", NA), levels = c("a", "b"))
-# res <- fact(x)
-# fact_levels(res) <- c("1", "a", "b", "c")
-# res
-
 `fact_levels<-` <- function(x, value) {
   x <- fact(x)
   levels <- levels(x)
@@ -289,49 +315,3 @@ fact_coerce_levels <- function(x) {
   make_fact(match(levels, value)[x], value, is.ordered(x))
 }
 
-
-fact_factor <- function(x) {
-  # browser()
-  .Deprecated("fact.factor()")
-  lvl <- levels(x)
-  nlvl <- try_numeric(lvl)
-
-  o <- order(nlvl)
-
-  if (!identical(o, seq_along(lvl))) {
-    reordered <- TRUE
-    nlvl <- as.character(lvl[o])
-  } else {
-    reordered <- FALSE
-  }
-
-  if (anyNA(x) & !anyNA(lvl)) {
-
-    if (reordered) {
-      m <- match(lvl[x], nlvl)
-      return(make_fact(m, c(nlvl, NA_character_), is.ordered(x)))
-    } else {
-      return(make_fact(x, c(lvl, NA_character_), is.ordered(x)))
-    }
-  }
-
-  if (anyNA(lvl)) {
-    w <- which(is.na(lvl))
-
-    if (w != length(lvl)) {
-      if (reordered) {
-        nlvl <- c(nlvl[-w], NA_character_)
-        return(make_fact(match(lvl[x], nlvl), nlvl, is.ordered(x)))
-      } else {
-        new_lvl <- c(lvl[-w], NA_character_)
-        return(make_fact(match(lvl, new_lvl)[x], new_lvl, is.ordered()))
-      }
-    }
-  }
-
-  if (reordered) {
-    make_fact(match(lvl[x], nlvl), nlvl, is.ordered(x))
-  } else {
-    x
-  }
-}

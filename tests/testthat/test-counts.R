@@ -110,3 +110,35 @@ test_that("missing upper levels", {
 
 # props() -----------------------------------------------------------------
 
+test_that("props() handles NA", {
+  x <- c(1, 1, 2, NA, 4)
+  res1 <- set_names0(c(.4, .2, .2, .2), c(1, 2, 4, NA))
+  res2 <- set_names0(c(.5, .25, .25, NA), c(1, 2, 4, NA))
+  expect_identical(props(x), res1)
+  expect_identical(props(x, na.rm = TRUE), res2)
+
+  # data frame
+  x <- c(1, 2, 2, 3, NA)
+  y <- flip(x)
+  df <- data.frame(x = x, y = y)
+
+  res_x1 <- data.frame(x = c(1, 2, 3, NA), prop = c(.2, .4, .2, .2))
+  res_x2 <- data.frame(x = c(1, 2, 3, NA), prop = c(.25, .5, .25, NA))
+  expect_identical(props(df, "x"), res_x1)
+  expect_identical(props(df, "x", na.rm = TRUE), res_x2)
+
+  res_xy1 <- data.frame(
+    x = c(1, 2, 2, 3, NA),
+    y = c(NA, 3, 2, 2, 1),
+    prop = rep(.2, 5)
+  )
+  res_xy2 <- data.frame(
+    x = c(1, 2, 2, 3, NA),
+    y = c(NA, 3, 2, 2, 1),
+    prop = c(NA, 1, 1, 1, NA) / 3
+  )
+
+  expect_identical(props(df, c("x", "y")), res_xy1)
+  expect_identical(props(df, c("x", "y"), na.rm = TRUE), res_xy2)
+})
+

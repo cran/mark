@@ -1,3 +1,7 @@
+test_that("set_names0() works", {
+  expect_null(set_names0(NULL))
+})
+
 test_that("names_switch() works", {
   x <- c(a = 1, b = 2, c = 3)
   y <- names(x)
@@ -26,4 +30,14 @@ test_that("names_sort() works", {
 
   expect_error(sort_names(list(a = 1)))
   expect_error(sort_names(NA))
+})
+
+test_that("%names% works", {
+  x <- 1:4
+  nm <- letters[1:4]
+
+  expect_identical(
+    x %names% nm,
+    set_names0(x, nm)
+  )
 })
