@@ -11,6 +11,11 @@ test_that("struct() works", {
       structure("a", class = "character")
     )
   )
+
+  x <- struct(1, "foo", at1 = 1, at2 = 2)
+  res <- struct(x, "foo", .keep_attr = "at2")
+  exp <- struct(1, "foo", at2 = 2)
+  expect_identical(res, exp)
 })
 
 test_that("struct() works for factors", {
@@ -40,4 +45,10 @@ test_that("examples", {
   expect_null(x)
   attributes(x) <- list()
   expect_identical(x, list())
+})
+
+test_that("struct() overwrites attributes", {
+  x <- struct(list(), class = "foo", a = 1L)
+  res <- struct(list(), class = "foo", a = 2L, .keep_attr = TRUE)
+  expect_identical(attr(res, "a", exact = TRUE), 2L)
 })

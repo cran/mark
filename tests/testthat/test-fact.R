@@ -149,13 +149,30 @@ test_that("as_ordered() works", {
   expect_identical(as_ordered(x), res)
 })
 
+test_that("as_ordered() doesn't duplicate class", {
+  res <- class(as_ordered(as.ordered(letters[1:3])))
+  expect_identical(res, c("fact", "ordered", "factor"))
+})
 
-# other -------------------------------------------------------------------
 
+# fact.default() ----------------------------------------------------------
 
 test_that("fact.default() fails", {
   expect_error(fact(struct(NULL, "foo")))
 })
+
+
+# `fact_levels<-`() -------------------------------------------------------
+
+test_that("`fact_levels<-`() works", {
+  x <- fact(1:3)
+  fact_levels(x) <- 1:4
+  exp <- struct(1:3, levels = as.character(1:4), class = c("fact", "factor"))
+  expect_identical(x, exp)
+})
+
+
+# fact_coerce_levels() ----------------------------------------------------
 
 test_that("fact_coerce_levels() works", {
   x <- as.Date("2021-09-03") + 0:2
@@ -168,4 +185,21 @@ test_that("fact_coerce_levels() works", {
 
   x <- as.POSIXlt("2021-09-03", tz = "UTC") + 0:2
   expect_equal(fact_coerce_levels(as.character(x)), x)
+})
+
+
+# try_numeric() -----------------------------------------------------------
+
+test_that("try_numeric() works", {
+  x <- 1
+  expect_identical(try_numeric(x), x)
+
+  x <- c(NA, NA)
+  expect_identical(try_numeric(x), x)
+
+  x <- c("a", 1)
+  expect_identical(try_numeric(x), x)
+
+  x <- c(1, NA, 2)
+  expect_identical(try_numeric(as.character(x)), x)
 })

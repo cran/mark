@@ -3,6 +3,7 @@
 #' Transforms a vector into an integer of IDs.
 #'
 #' @param x A vector of values
+#' @param ... Additional arguments passed to methods
 #'
 #' @returns A `pseudo_id` object where the `integer` value of the vector
 #' correspond to the position of the unique values in the attribute `"uniques"`.
@@ -14,26 +15,28 @@
 #' attr(pid, "uniques")[pid]
 #'
 #' @export
-pseudo_id <- function(x) {
+pseudo_id <- function(x, ...) {
   UseMethod("pseudo_id", x)
 }
 
 #' @export
 #' @rdname pseudo_id
-pseudo_id.pseudo_id <- function(x) {
+pseudo_id.pseudo_id <- function(x, ...) {
   x
 }
 
 #' @export
 #' @rdname pseudo_id
-pseudo_id.default <- function(x) {
-  ux <- na_last(unique(x))
+#' @param na_last `Logical` if `FALSE` will not place `NA` at the end
+pseudo_id.default <- function(x, na_last = TRUE, ...) {
+  ux <- unique(x)
+  if (na_last) ux <- na_last(ux)
   make_pseudo_id(match(x, ux), ux)
 }
 
 #' @export
 #' @rdname pseudo_id
-pseudo_id.factor <- function(x) {
+pseudo_id.factor <- function(x, ...) {
   x <- fact(x)
   pseudo_id(fact_coerce_levels(levels(x))[x])
 }
@@ -42,7 +45,7 @@ pseudo_id.factor <- function(x) {
 #' @export
 print.pseudo_id <- function(x, ...) {
   print(as.integer(x))
-  cat("Uniques: ", paste0(unique(x), sep = " "), "\n", sep = "")
+  cat("Uniques: ", paste0(attr(x, "uniques"), sep = " "), "\n", sep = "")
   invisible(x)
 }
 

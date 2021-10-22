@@ -9,3 +9,32 @@ test_that("match param", {
   expect_equal(foo(c("b", "a")), "b")
   expect_error(foo("c"))
 })
+
+test_that("utils", {
+  expect_true(has_length(1))
+  expect_false(has_length(NULL))
+  expect_false(has_length(integer()))
+
+  expect_true(is_unique(1:2))
+  expect_false(is_unique(c(1, 1)))
+
+  res <- remove_class(struct(1, class = "foo"))
+  expect_identical(class(res), "numeric")
+
+  expect_identical(append0(1:3, 4L), 1:4)
+})
+
+test_that("check_interactive() works", {
+  op <- options("mark.check_interactive")
+
+  options(mark.check_interactive = TRUE)
+  expect_identical(check_interactive(), interactive())
+
+  options(mark.check_interactive = FALSE)
+  expect_true(check_interactive())
+
+  options(mark.check_interactive = NA)
+  expect_false(check_interactive())
+
+  options(op)
+})

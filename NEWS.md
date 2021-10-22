@@ -1,3 +1,34 @@
+# mark 0.4.0
+
+## New features
+
+* adds `percentile_rank()` to calculate percentile ranks with a vector
+* adds `insert()` to insert multiple values into a vector
+* `pseudo_id()` gains argument `na_last` to change positioning of `NA` values
+* `is_true()` and `is_false()` are now exported as generics with methods for `default` and `logical`
+* adds `omit_na()` for tracking positions of `NA` and non-`NA` values
+* `quick_df(NULL)`  now returns an empty `data.frame`
+* `quick_dfl()` exported as a wrapper for `quick_df(list(...))`
+
+## Fixes
+
+* `squash_vec()` now works correctly when values are not ordered [#43](https://github.com/jmbarbone/mark/issues/43)
+* `as_ordered()` no longer duplicates `ordered` class [#44](https://github.com/jmbarbone/mark/issues/44)
+* `counts.data.frame()` and `props.data.frame()` correctly make column names unique
+* internal `try_numeric()` correctly handles `NA`s
+* `flip.matrix(, keep_rownames = FALSE)` now works correctly
+* `any_match()` now works as expected
+* `lines_of_r_code()` now works correctly reading a single file
+* `import(, overwrite = TRUE)` now works
+* `ls_function()`, `ls_object()`, `ls_dataframe()`, and `ls_all()` have improvements for environmental searching
+* `assign_labels.data.frame(.missing = "warning")` correctly removes missing columns
+* `remove_na.factor()` no long drops additional classes other than `ordered` and `factor` 
+
+## Others
+
+* documentation of `struct()` overwriting attributes improved and examples
+* adds more unit tests
+
 # mark 0.3.0
 
 ## Fixes

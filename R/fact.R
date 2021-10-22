@@ -215,7 +215,13 @@ as_ordered <- function(x) {
 #' @rdname as_ordered
 #' @export
 as_ordered.default <- function(x) {
-  add_class(fact_remove_na(x), "ordered", 2L)
+  res <- fact_remove_na(x)
+
+  if (!is.ordered(x)) {
+    res <- add_class(res, "ordered", 2L)
+  }
+
+  res
 }
 
 
@@ -260,8 +266,9 @@ try_numeric <- function(x) {
     return(x)
   }
 
-  nums[nas] <- NA
-  nums
+  out <- rep.int(NA_real_, length(x))
+  out[!nas] <- nums
+  out
 }
 
 
@@ -290,11 +297,14 @@ fact_coerce_levels <- function(x) {
   } else if (!anyNA(posix)) {
     x <- rep(NA_real_, n)
 
-    if (any(nas)) {
-      x[!nas] <- as.double(posix)
-    } else {
+
+    # Is this needed?
+    stopifnot(all(!nas))
+    # if (any(nas)) {
+    #   x[!nas] <- as.double(posix)
+    # } else {
       x[] <- as.double(posix)
-    }
+    # }
     x <- as.POSIXct(
       x          = x,
       origin     = "1970-01-01",

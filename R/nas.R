@@ -57,13 +57,30 @@ remove_na.factor <- function(x) {
     }
   }
 
-  levels(out) <- lvls[!na_levels]
-  class(out) <- c(if (is.ordered(x)) "ordered", "factor")
-  out
+  struct(out, class(x), levels = lvls[!na_levels])
 }
 
-unique_no_na <- function(x) {
-  unique(remove_na(x))
+#' Omit NA values
+#'
+#' @param x A vector of values
+#' @return `x` which `NA` values removes and two attributes of `integers`: `na`
+#'   which is the position of `NA` values, and `valid` for the position of
+#'   non-`NA` values; empty positions reported as `integer(0)`
+#' @examples
+#' # Like stats::na.omit but always provides
+#' x <- letters[1:5]
+#' omit_na(x)
+#' x[c(3, 5)] <- NA
+#' omit_na(x)
+#'
+#' @export
+omit_na <- function(x) {
+  if (anyNA(x)) {
+    nas <- is.na(x)
+    struct(x, class = class(x), na = which(nas), valid = which(!nas))
+  } else {
+    struct(x, class = class(x), na = integer(), valid = seq_along(x))
+  }
 }
 
 #' Remove NULL
@@ -162,5 +179,9 @@ tableNA <- function(..., .list = FALSE) {
     names(ls) <- as.character(sys.call())[-1]
   }
 
-  table(lapply(ls, function(x) mark::fact(is.na(x))))
+  out <- table(lapply(ls, function(x) mark::fact(is.na(x))))
+  dn <- rep(list(c(TRUE, FALSE)), length(ls))
+  names(dn) <- names(ls)
+  dimnames(out) <- dn
+  out
 }

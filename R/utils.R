@@ -21,6 +21,11 @@ magrittr::`%>%`
   if (is.null(x)) y else x
 }
 
+# isTRUE, isFALSE, ...
+isNA <- function(x) {
+  is.logical(x) && length(x) == 1L && is.na(x)
+}
+
 #' Colons
 #'
 #' Get an object from a package
@@ -130,29 +135,14 @@ is_unique <- function(x) {
   anyDuplicated(x) == 0L
 }
 
-as_character <- function(x) {
-  if (is.factor(x)) {
-    return(levels(x)[x])
-  }
-
-  as.character(x)
-}
-
 is_atomic0 <- function(x) {
   is.atomic(x) && !is.null(x)
 }
 
-which_unwrap <- function(w, n = max(w)) {
-  n <- max(n, max(w)) # protective
-  x <- logical(n)
-  x[w] <- TRUE
-  x
-}
 
 cat0 <- function(...) cat(..., sep = "")
 catln <- function(...) cat(..., sep = "\n")
 charexpr <- function(x) as.character(as.expression(x))
-
 
 mark_temp <- function(ext = "") {
   if (!grepl("^[.]", ext) && !identical(ext, "") && !is.na(ext)) {
@@ -169,23 +159,6 @@ mark_temp <- function(ext = "") {
   norm_path(tempfile(oc, fileext = ext))
 }
 
-
-mark_temp_from_raw <- function(x) {
-  splits <- strsplit(x, "/")[[1]]
-  y <- splits[length(splits)]
-  y <- gsub("__.*$", "", y)
-  s <- seq(1, nchar(y) - 1, by = 2)
-  raws <- mapply(substr, x = y, start = s, stop = s + 1L, USE.NAMES = FALSE)
-  wuffle(rawToChar(as.raw(strtoi(raws, base = 16L))))
-}
-
-# foo <- function(...) mark_temp()
-# foobar <- function(...) foo(...)
-# # returns where the function was called from
-# foo(a = 1)
-# x <- foobar(what = this, those = 1)
-# # can retrieve the function from the file name
-# mark_temp_from_raw(x)
 
 check_is_vector <- function(x, mode = "any") {
   if (isS4(x) | inherits(x, c("data.frame", "matrix", "array")) | !is.vector(remove_attributes(x), mode)) {
@@ -224,20 +197,34 @@ remove_class <- function(x, cl = NULL) {
 
 append0 <- function(x, values, pos = NULL) {
   if (is.null(pos)) {
-    c(x, values)
-  } else if (pos == 1L) {
-    c(values, x)
-  } else {
-    c(x[1L:(pos - 1L)], values, x[pos:length(x)])
+    return(c(x, values))
   }
+
+  if (pos == 1L) {
+    return(c(values, x))
+  }
+
+  n <- length(x)
+  pos <- min(pos, n)
+  c(x[1L:(pos - 1L)], values, x[pos:n])
 }
 
 check_interactive <- function() {
-  if (!isFALSE(getOption("mark.check_interactive"))) {
+  op <- getOption("mark.check_interactive", TRUE)
+
+  if (isTRUE(op)) {
     return(interactive())
   }
 
-  TRUE
+  if (isFALSE(op)) {
+    return(TRUE)
+  }
+
+  if (isNA(op)) {
+    return(FALSE)
+  }
+
+  stop("mark.check_interactive must be TRUE, FALSE, or NA")
 }
 
 
