@@ -1,7 +1,7 @@
-bdc113024f7b6549363952ece442d95b *DESCRIPTION
+d8d22c13899e9b02fa71ce05ce5845cc *DESCRIPTION
 d3f5ccf0e2b80cb25cd52960b8385160 *LICENSE
 cd73b37cd5c81a2e97333011971aa57d *NAMESPACE
-5dbcce874582c1a52a2d939c44c983f9 *NEWS.md
+a70a8f157ce895ce7a44db28730f0eab *NEWS.md
 03cd05329768e6f4361874eeb8379583 *R/apply.R
 5a64e239ae39730b285e556c9566805f *R/array.R
 7f8ad303cb617376a1be225ad9385297 *R/base-conversion.R
@@ -15,7 +15,7 @@ bd167e56f4a7b4654f9c222917dc42bc *R/dataframes.R
 92ae36a742356d4472f5a766f5a203a0 *R/dates.R
 be892389192073a22323bcd05e198b05 *R/depth.R
 ac448d6d8b588087f8a968f4338cd619 *R/description.R
-8d28cdaf0f61147da45c3585e367702e *R/detail.R
+75ef22beb695f264e2790f00a189838c *R/detail.R
 511733fcbdca186d260d61761508b056 *R/diff-time.R
 1f7ca43acfc14726ed5d64ff1dbce850 *R/directory.R
 17c451c827d4b1feca2bfd89935129f2 *R/environments.R
@@ -44,7 +44,7 @@ bf022103b7f262339df08e872bc519c5 *R/names.R
 9cd27e38dfcb37626c22e2b9decd9eda *R/not-available.R
 cfa7c230afe36e1b678dc54fab8bcb72 *R/note.R
 8b14ef454140f4d24af2a5bac093e720 *R/options.R
-a751ab31463a8b3a56191d949c27d512 *R/paste.R
+c7be37ef09dd9d8e0d3996bb1d2b5540 *R/paste.R
 7535a99145815d9ff2b30224e8b7f61f *R/percent_rank.R
 eb8f7d28513336a4a8f71e0c6b0abb75 *R/plot.R
 b15a185e69feb5d1708655b7bf2c01ef *R/pseudo-id.R
@@ -55,7 +55,7 @@ b15a185e69feb5d1708655b7bf2c01ef *R/pseudo-id.R
 1f66c8f229eaaec431fa9cb3263ea716 *R/sourcing.R
 fe0a63ba9ec9b2925e82050bc117baae *R/stats.R
 fa38533522739d8036b4b78b4d9fee2e *R/strings.R
-889f56a7980c1a9eedab124866bb7636 *R/struct.R
+acf3a8e4bf88b5e5bdaad77b43a3b1c2 *R/struct.R
 fc10d6d81c7537ddf5f667e45b171500 *R/switch.R
 f72e81cac9650e77178f22311b524ce0 *R/system-file.R
 e3be6fb3acc1260adb9475905c60bc22 *R/time-report.R
@@ -63,7 +63,7 @@ e3be6fb3acc1260adb9475905c60bc22 *R/time-report.R
 f3186d672ba7e6f9c1d09837074f6a1f *R/unlist.R
 71fb7183d54f66f27feb76536f377d4a *R/utils.R
 93d8944b736da36763fe3aafc30edbf8 *R/zzz.R
-77b47825f0c0f174cbec5f9674402415 *README.md
+312bd10e41ebba23b252a2430affbafe *README.md
 f4b547bd1002653ade86439658f17813 *inst/WORDLIST
 c3478d59f92f252a0f2838b7a242838f *inst/extdata/example-bib.txt
 b3c2b486fab66b5082f92e6307b9f1f5 *man/add_file_timestamp.Rd
@@ -81,7 +81,7 @@ ec524fea77abcca30e55c2cf8c8ed572 *man/chr_split.Rd
 06adb8b524100023e2344cc61c186c4b *man/counts.Rd
 498ae3b6c15557f1cc3533e93a27ad08 *man/date_from_partial.Rd
 17f02c6cafd98016eb905f1b7cb9ba99 *man/depth.Rd
-a45e061854b46d659a0c343e11a76f24 *man/detail.Rd
+b40e6b9622689f89e9bcfb1f24188741 *man/detail.Rd
 fdd5e958c847679fc52854ac628e2676 *man/diff_time.Rd
 3aca70b384ab4c5d2c1792bc1ac95fc9 *man/ept.Rd
 36bdbb0a84e9756a50e107be585976a0 *man/eval_named_chunk.Rd
@@ -150,7 +150,7 @@ ae489fd22fe7866288da4af7016532f3 *man/source_files.Rd
 6ae0c8f29c3d009003b46b0105c5c315 *man/sourcing.Rd
 dffd1531ecae7dcaa67e50bba822b8a0 *man/str_extract_date.Rd
 853fc3f59dea528fea0522df27bee5fd *man/str_slice.Rd
-17410d30cd1b71ccd65bdc1b9c94214d *man/struct.Rd
+c522371da5bc10c0daf8a3f0578e5d62 *man/struct.Rd
 6d9d057378f6221ecc6f91848fc9d925 *man/switch-ext.Rd
 964631ad17eac2d2ec0a39216b7826d0 *man/t_df.Rd
 bf0ad09f3557f8a4e3b20237d3b0fc4e *man/tableNA.Rd
@@ -192,7 +192,7 @@ d790cd023d6fc48abf997fcd4ec3a5e0 *tests/testthat/test-char2fact.R
 7ea99cde34544de0ff362fe6eefba274 *tests/testthat/test-dates.R
 f9e2c5311869f7be555e39bf1849af32 *tests/testthat/test-depth.R
 4df0aee529d82d78b97cd2833f352ee5 *tests/testthat/test-description.R
-476f6d1b22ba679ff64f0186c0757158 *tests/testthat/test-detail.R
+7cd94a82fac91101fa78333bb0800186 *tests/testthat/test-detail.R
 ffcf4547e2430c3985e9d80d1bb07484 *tests/testthat/test-diff-time.R
 6489e26aa7916680003a9708c1e77659 *tests/testthat/test-directory.R
 7ce29619d2d023b784511c2aefa8b3e9 *tests/testthat/test-environments.R
@@ -221,7 +221,7 @@ b5aab1e1f4159a9a1df9fc7b8eb56557 *tests/testthat/test-nas.R
 dbd5c189a107b02bec8039cbdaf444b5 *tests/testthat/test-note.R
 205e40d493ab8c126c873106fc9a2e18 *tests/testthat/test-options.R
 d96d2a49de1f225bac80222c13fd9132 *tests/testthat/test-out.R
-34f9f428d55b9cab1bba7538b1c2f267 *tests/testthat/test-paste.R
+1f60764ef7c023d0213c78ee36bac0a4 *tests/testthat/test-paste.R
 486b4c3b01522dd556d7cc768e74deee *tests/testthat/test-percentile_rank.R
 744137f44444e168b17046eafa7e3b93 *tests/testthat/test-plot.R
 e591ee46de4f562a43df0b10288cc589 *tests/testthat/test-pseudo_id.R
@@ -234,7 +234,7 @@ bfd7b5b02dd1211dc3e3b662a711232a *tests/testthat/test-sourcing.R
 75eb2dec220994ee987bb278a50df556 *tests/testthat/test-strings.R
 2e4a42bddb83a7c190f3d52bedbf65c8 *tests/testthat/test-struct.R
 5e2bc522dba4bb972767cd382001af3f *tests/testthat/test-switch.R
-5338efd0950b6eafe22dab9700878465 *tests/testthat/test-system-file.R
+ac58d1eed56b657713fa06f88e6f7399 *tests/testthat/test-system-file.R
 61ede9300ba94be6b3703b4b99f0045e *tests/testthat/test-time-report.R
 c1cefa7a36dc38eb258af895158a7962 *tests/testthat/test-todos.R
 d6b58f7f468d56f4d6881de89748bd90 *tests/testthat/test-unlist.R

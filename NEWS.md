@@ -1,3 +1,10 @@
+# mark 0.4.1
+
+* `details(factor)` no longer adds `fact` class to `factors` [#50](https://github.com/jmbarbone/mark/issues/50)
+* `details()` gains new argument `factor_n` to control threshold for making character vectors into factors
+* `detail.data.frame()` now works with single column data.frames [#48](https://github.com/jmbarbone/mark/issues/48)
+* `paste_combine()` no longer duplicated the second vector of `...` when `length(...) > 2` [#52](https://github.com/jmbarbone/mark/issues/52)
+
 # mark 0.4.0
 
 ## New features
@@ -22,7 +29,7 @@
 * `import(, overwrite = TRUE)` now works
 * `ls_function()`, `ls_object()`, `ls_dataframe()`, and `ls_all()` have improvements for environmental searching
 * `assign_labels.data.frame(.missing = "warning")` correctly removes missing columns
-* `remove_na.factor()` no long drops additional classes other than `ordered` and `factor` 
+* `remove_na.factor()` no long drops additional classes other than `ordered` and `factor`
 
 ## Others
 
