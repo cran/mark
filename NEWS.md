@@ -1,3 +1,47 @@
+# mark 0.5.0
+
+The package website https://jmbarbone.github.io/mark/ is now available!
+More references and vignettes will make their way here in future releases.
+
+## Fixes
+
+* `detail(NA)` (or when `x` has only `NA` values) no longer throws a warning and returns `NA` for `min_c`, `max_c` [#59](https://github.com/jmbarbone/mark/issues/59)
+* `print.noted()` now passes `...` to next methods [#67](https://github.com/jmbarbone/mark/issues/67)
+* corrects deprecation warning in `assign_label()` [#74](https://github.com/jmbarbone/mark/issues/74)
+  * `assign_label()` will be removed in `0.4.2`
+* `set_not_available()` now seems to work correctly -- it probably hasn't actually be working most of the time
+* `percentile_rank()` is now more correct when `x` is a decimal by checking for unique values first [#92](https://github.com/jmbarbone/mark/issues/92)
+* `counts.data.frame()` now handle factor columns better
+
+## New features
+
+* Functions in `?handlers`, all allow for additional params passed through `...` [#34](https://github.com/jmbarbone/mark/issues/34)
+* adds `row_bind()` to bind a list of `data.frames()` [#46](https://github.com/jmbarbone/mark/issues/46)
+ * adds `drop_levels()` with `factor` and `data.frame` methods; functions similarly to `base::droplevels()` but is a little faster [#54](https://github.com/jmbarbone/mark/issues/54)
+* `todos()` and `fixmes()` gain a new param `force`
+  * When `TRUE`, forces searches for `.R` files when the given directory does not contain an `.Rproj` file
+  * When `FALSE`, prevents long start ups when these functions are called in a `.Rprofile` file and R is not launches in a project directory
+  * This be toggled with a new options `mark.todos.force`
+* adds `set_note()`, a wrapper for `note<-()` [#77](https://github.com/jmbarbone/mark/pull/77)
+* adds `fact2char()` to compliment `char2fact()` [#75](https://github.com/jmbarbone/mark/pull/75)
+* `print.pseudo_id()` now truncates long uniques to a single line [#70](https://github.com/jmbarbone/mark/pull/70)
+* `match_param(NULL, null = TRUE)` allows `param` to safely return `NULL` [#89](https://github.com/jmbarbone/mark/issues/89)
+* `fact_na()` is added to use `fact` vectors with `NA` levels that work with `is.na()` [#69](https://github.com/jmbarbone/mark/issues/69) and other `NA` handling improvements
+* adds a new `print._mark_bib_df()` method to supporting printing lists
+* adds new methods for `facts`: `as.integer.fact()`, `as.double.fact()`, `remove_na.fact()`
+
+## Breaking changes
+
+* `fact.numeric()` now treats `NaN` the same as `NA`, no extra level/unique value is retained
+* `read_clipboard()` now returns `NA` when the clipboard is empty, rather than `""` (improvements with internal type conversions)
+* improvements to `NA` handling as well
+
+## Other, non-visible
+
+* github actions updated
+* internal type conversion now heavily relies on `utils::type.convert()` with some additional functionality for logical (e.g., character string using `"true"` and `"false"`) and for guessing dates in a `YYYY-MM-DD` format
+* general clean up and formatting
+
 # mark 0.4.1
 
 * `details(factor)` no longer adds `fact` class to `factors` [#50](https://github.com/jmbarbone/mark/issues/50)

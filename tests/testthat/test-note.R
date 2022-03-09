@@ -26,6 +26,23 @@ test_that("note() work", {
   note(x) <- NULL
   expect_null(attr(x, "note"))
   expect_identical(class(x), "character")
+
+  x <- "x"
+  y <- set_note(x, "this note")
+  note(x) <- "this note"
+  expect_identical(x, y)
+})
+
+test_that("print.noted() passes to next methods [67]", {
+  skip_if_not_installed("tibble")
+
+  # not bothering with snapshots
+  x <- tibble::tibble(a = 1:50)
+  note(x) <- "note"
+  expect_match(
+    utils::tail(capture.output(print(x, n = 40)), 1),
+    "with 10 more rows"
+  )
 })
 
 test_that("print_note() works with data.frame", {
