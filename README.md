@@ -151,13 +151,20 @@ quick_df(x)
 #> 3 3 c
 #> 4 4 d
 #> 5 5 e
-vector2df(x[["b"]])
-#>   name value
-#> 1   NA     a
-#> 2   NA     b
-#> 3   NA     c
-#> 4   NA     d
-#> 5   NA     e
+
+vector2df(x[["b"]], name = NULL)
+#>   value
+#> 1     a
+#> 2     b
+#> 3     c
+#> 4     d
+#> 5     e
+
+quick_dfl(a = 1:3, b = list(1:5, 6:10, 11:15))
+#>   a                  b
+#> 1 1      1, 2, 3, 4, 5
+#> 2 2     6, 7, 8, 9, 10
+#> 3 3 11, 12, 13, 14, 15
 ```
 
 Counts and proportions:

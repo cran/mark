@@ -4,15 +4,13 @@ test_that("default assignment", {
   x1 <- remove_labels(x)
 
   expect_false(inherits(x, "labelled")) # Hmisc::label produces this class
-  expect_equal(attr(x, "label"), "runs")
+  expect_equal(exattr(x, "label"), "runs")
 
   expect_error(assign_labels(x, NULL))
   expect_error(assign_labels(x, 1:2))
 
   expect_equal(x0, x1)
   expect_true(is.null(attr(x1, "label")))
-
-  expect_warning(assign_label(x, "what"), "deprecated")
 })
 
 test_that("data.frame assignment", {
@@ -89,4 +87,9 @@ test_that("view_labels() works", {
 
   View <- NA
   expect_error(view_labels(df), "Something went wrong")
+})
+
+test_that("exact match [141]", {
+  x <- struct(1L, "integer", labels = 1:2)
+  expect_identical(get_labels(x), NA_character_)
 })

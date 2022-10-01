@@ -79,9 +79,7 @@ find_author <- function() {
   )
 }
 
-
 # Version -----------------------------------------------------------------
-
 
 #' Get and bump version
 #'
@@ -167,7 +165,7 @@ update_version <- function(version = NULL, date = FALSE) {
   }
   # nocov end
 
-  if (identical(men, "yes") | isNA(getOption("mark.check_interactive"))) {
+  if (identical(men, 1L) | isNA(getOption("mark.check_interactive"))) {
     foo()
   }
 
@@ -199,10 +197,8 @@ do_bump_date_version <- function(version) {
     x[n] <- x[n] + 1
   }
 
-
   package_version(collapse0(x, sep = "."))
 }
-
 
 # Some redundancy here
 # What about just packageVersion() ?

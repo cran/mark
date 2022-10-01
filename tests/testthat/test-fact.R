@@ -56,7 +56,7 @@ test_that("fact.factor() works", {
   class(x) <- c("fact", "factor")
   expect_identical(fact(x), x)
 
-  x <- ordered(x)
+  x <- ordered(letters)
   class(x) <- c("fact", "ordered", "factor")
   expect_identical(fact(x), x)
 
@@ -86,30 +86,49 @@ test_that("fact.factor() works", {
 test_that("fact.haven_labelled() works", {
   skip_if_not_installed("haven")
   .haven_as_factor <- "haven" %colons% "as_factor.haven_labelled"
-  haven_as_factor <- function(...) add_class(.haven_as_factor(...), "fact", 1L)
+  haven_as_fact <- function(...) {
+    res <- fact(.haven_as_factor(...))
+    attr(res, "label") <- exattr(..1, "label")
+    res
+  }
+
+  expect_id_fact <- function(x) {
+    testthat::expect_identical(
+      fact(x),
+      haven_as_fact(x),
+      ignore_attr = c("uniques", "na")
+    )
+  }
 
   # Integers
   r <- rep(1:3, 2)
   x <- haven::labelled(r, labels = c(good = 1, bad = 3))
-  expect_identical(fact(x), haven_as_factor(x))
+  expect_id_fact(x)
 
   x <- haven::labelled(r, labels = c(good = 1, bad = 3), label = "this")
-  expect_identical(fact(x), haven_as_factor(x))
+  expect_id_fact(x)
 
   x <- haven::labelled(r, labels = c(good = 1, neutral = 2, bad = 3), label = "this")
-  expect_identical(fact(x), haven_as_factor(x))
+  expect_id_fact(x)
 
   x <- haven::labelled(r, label = "this")
-  expect_identical(fact(x), haven_as_factor(x))
-
+  expect_id_fact(x)
 
   # Doubles
   x <- haven::labelled(c(0, 0.5, 1), c(a = 0, b = 1))
-  expect_identical(fact(x), haven_as_factor(x))
+  expect_id_fact(x)
 
   # Character
   x <- haven::labelled(letters, c(good = "j", something = "m", cool = "b"))
-  expect_identical(fact(x), haven_as_factor(x))
+  expect_id_fact(x)
+
+  # Unique not in levels; levels not in unique
+  x <- haven::labelled(
+    c(-10, 20, 40, 60),
+    labels = c(a = 10, b = 20, c = 30, d = 40),
+    label = "foo"
+  )
+  expect_id_fact(x)
 })
 
 # nas ----
@@ -203,10 +222,12 @@ test_that("fact_coerce_levels() works", {
 
   # Be careful about setting a time zone
   # Not very good for dealing with local
-  x <- as.POSIXlt("2021-09-03", tz = "UTC") + 0:2
+  # NOTE r-dev after 4.2.1 has some weird behavior with the 0 and returns:
+  #  ('2021-09-03', '2021-09-03 00:00:01', '2021-09-03 00:00:02')
+  x <- as.POSIXlt("2021-09-03", tz = "UTC") + 1:3
   expect_equal(fact_coerce_levels(as.character(x)), x)
 
-  x <- as.POSIXlt("2021-09-03", tz = "UTC") + 0:2
+  x <- as.POSIXlt("2021-09-03", tz = "UTC") + 1:3
   expect_equal(fact_coerce_levels(as.character(x)), x)
 })
 
@@ -240,14 +261,53 @@ test_that("drop_levels() works", {
   expect_equal(drop_levels(df), df_exp)
 
   # facts and ordered
+  x <- fact(1:10)
+  expect_identical(drop_levels(x), x)
+
   x <- as_ordered(factor(1, 1:2))
   exp <- struct(1L, class = c("fact", "ordered", "factor"), levels = "1", uniques = 1L, na = 0L)
   expect_equal(drop_levels(x), exp)
 })
 
 
+# fact_reverse() ----------------------------------------------------------
+
+test_that("fact_reverse() works", {
+  res <- fact_reverse(1:4)
+  exp <- new_fact(4:1, 4:1)
+  expect_identical(res, exp)
+
+  res <- fact_reverse(as_ordered(1:4))
+  exp <- new_fact(4:1, 4:1, ordered = TRUE)
+  expect_identical(res, exp)
+
+  res <- fact_reverse(c(1:3, NA))
+  exp <- new_fact(c(3:1, 4L), c(3:1, NA))
+  expect_identical(res, exp)
+
+  res <- fact_reverse(as_ordered(c(1:3, NA)))
+  exp <- struct(
+    c(3:1, NA),
+    class = c("fact", "ordered", "factor"),
+    levels = c("3", "2", "1"),
+    uniques = 3:1,
+    na = 0L
+  )
+
+  expect_identical(res, exp)
+})
+
+
 
 # other methods -----------------------------------------------------------
+
+test_that("[.fact() works", {
+  x <- fact(1:3)
+  x1 <- do.call(structure, c(1, attributes(x)))
+  x2 <- do.call(structure, c(2, attributes(x)))
+  expect_identical(x[1], x1)
+  expect_identical(x[2], x2)
+})
 
 test_that("is.na.fact(), works", {
   x <- fact(c(1, 2, NA, 3))
@@ -279,4 +339,43 @@ test_that("as.integer.fact() works", {
   exp <- c(1, 2, NA_real_, 3)
   expect_identical(res, exp)
   expect_identical(as.numeric(x), exp)
+})
+
+test_that("unique.fact() works", {
+  x <- fact(c(1, 2, NA, 3, 2))
+  exp <- fact(c(1, 2, NA, 3))
+  res <- unique(x)
+  expect_identical(exp, res)
+
+  x <- as_ordered(x)
+  exp <- as_ordered(exp)
+  res <- unique(x)
+  expect_identical(exp, res)
+})
+
+test_that("as.Date.fact() works", {
+  exp <- as.Date(c("2022-01-02", NA, "1908-12-21"))
+  res <- as.Date(fact(exp))
+  expect_identical(exp, res)
+
+  x <- c("01-01-2022", "01-02-2000")
+  exp <- as.Date(x, "%d-%m-%Y")
+  res <- as.Date(fact(x), "%d-%m-%Y")
+  expect_identical(exp, res)
+})
+
+test_that("as.character.fact() works", {
+  exp <- c("a", NA_character_, "b", "b", "a")
+  res <- as.character(fact(exp))
+  expect_identical(exp, res)
+})
+
+# snapshots ---------------------------------------------------------------
+
+test_that("snapshots", {
+  expect_snapshot(fact(character()))
+  expect_snapshot(fact(1:5))
+  expect_snapshot(print(fact(1:100), max_levels = TRUE))
+  expect_snapshot(print(fact(1:100), max_levels = 20))
+  expect_snapshot(print(fact(1:100), max_levels = 100))
 })

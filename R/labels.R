@@ -116,27 +116,6 @@ assign_labels.data.frame <- function(x, ..., .missing = c("error", "warn", "skip
 
 #' @export
 #' @rdname labels
-assign_label <- function(x, ...) {
-  msg <- collapse0(
-    "`mark::assign_label()` is deprecated.",
-    "Use `mark::assign_labels()` instead.",
-    "This function will be removed in mark 0.5.1",
-    sep = "\n"
-  )
-  cond <- warningCondition(
-    message = msg,
-    old = "assign_label()",
-    new = "assign_labels()",
-    package = "mark",
-    class = "deprecatedWarning"
-  )
-  warning(cond)
-  assign_labels(x, ...)
-}
-
-
-#' @export
-#' @rdname labels
 get_labels <- function(x) {
   UseMethod("get_labels", x)
 }
@@ -144,7 +123,7 @@ get_labels <- function(x) {
 #' @export
 #' @rdname labels
 get_labels.default <- function(x) {
-  attr(x, "label") %||% NA_character_
+  exattr(x, "label") %||% NA_character_
 }
 
 #' @export
@@ -152,7 +131,6 @@ get_labels.default <- function(x) {
 get_labels.data.frame <- function(x) {
   vector2df(vap_chr(x, get_labels, .nm = TRUE), "column", "label")
 }
-
 
 #' @export
 #' @rdname labels
