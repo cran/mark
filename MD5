@@ -1,7 +1,7 @@
-62a69d937746c8d0da2284b8fd0bc2dc *DESCRIPTION
+d9c0c946ab3037ec9ce87cab416a2984 *DESCRIPTION
 4434a1ec4fc39bd0d080612f5e40be41 *LICENSE
 03f6c3e4fcf3f2537fc40e788ea3f63f *NAMESPACE
-ee2041876e72c5efe1f1158fde1b78ef *NEWS.md
+f1f029c1c3a4deaae07f38c430758a3c *NEWS.md
 1cb06da8eab422d20bfac1c8d1e82f41 *R/aaa.R
 bcb755e0af54aae3e8a08860f7127b98 *R/append.R
 58810648016258d8c9f08c3290758c83 *R/apply.R
@@ -18,7 +18,7 @@ ada19d7a9d2aecaecf3dc29de4fd5e40 *R/counts.R
 a8e50a21e9b1385989ac40e11c35d0e5 *R/depth.R
 7ebb6d44246dd3ba03274a6cf74c8942 *R/description.R
 b4a23f9a24d1d8efc25f52a7884128b4 *R/detail.R
-7b9af66081e5abde3b704aecb67103a2 *R/diff-time.R
+1233df881569b9606842398064028b48 *R/diff-time.R
 15f6a320251439212722915a63a27791 *R/directory.R
 8d836aae17af784155a97c18b87db9b2 *R/environments.R
 3f389197d71be7e4372bfca78d2fc123 *R/expand.R
@@ -179,6 +179,7 @@ b2baf35d5e7ff04461d33068b80867aa *man/use_author.Rd
 ff0a0e9c156f4ba707b0a7631b755add *man/within_call.Rd
 6a93ce3b2159647c463dd98eb478ee1b *tests/spelling.R
 0348e9ca2ce88a837f0fdea8a0fe3c9d *tests/testthat.R
+7aa8c67a61f6f28f0a811ce3c89f2209 *tests/testthat/Rplots.pdf
 c6e17448cab5685c23001282fe21702f *tests/testthat/_snaps/bib.md
 4e8aa1ba30cd6cf2bec61ebc421ca42f *tests/testthat/_snaps/diff-time.md
 bd323be890f82d3ab831e713fb6bd2ef *tests/testthat/_snaps/fact.md
@@ -208,7 +209,7 @@ df229847f7fec89dbc7b00384af24007 *tests/testthat/test-dates.R
 053da73becc3caceac87bf9c710df3d2 *tests/testthat/test-depth.R
 a5c28945ff7f76a8019c18ab804578ec *tests/testthat/test-description.R
 979a92a0302c532ad981c1c60069b017 *tests/testthat/test-detail.R
-75219cec6e9e79ea5c7a33344ad12b8d *tests/testthat/test-diff-time.R
+e1a7748ebd50591e8e7d268a6c6beef5 *tests/testthat/test-diff-time.R
 e57f558af4916d67c8b4d70ef3ed859c *tests/testthat/test-directory.R
 2b4f4f10db676f37591a18335ca8a667 *tests/testthat/test-environments.R
 934ef10496c37c549134da2bbb1f2f67 *tests/testthat/test-expand.R

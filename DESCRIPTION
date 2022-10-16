@@ -1,7 +1,7 @@
 Package: mark
 Type: Package
 Title: Miscellaneous, Analytic R Kernels
-Version: 0.5.2
+Version: 0.5.3
 Date: 2022-09-29
 Authors@R: 
     person(given   = "Jordan Mark",
@@ -30,7 +30,7 @@ Config/testthat/edition: 3
 Config/testthat/parallel: true
 Language: en-US
 NeedsCompilation: no
-Packaged: 2022-10-01 04:07:50 UTC; jordan
+Packaged: 2022-10-14 13:09:13 UTC; jordan
 Author: Jordan Mark Barbone [aut, cph, cre] (0000-0001-9788-3628)
 Repository: CRAN
-Date/Publication: 2022-10-01 06:50:07 UTC
+Date/Publication: 2022-10-16 13:20:02 UTC
