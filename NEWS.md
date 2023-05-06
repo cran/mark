@@ -1,3 +1,31 @@
+# mark 0.6.0
+
+## New features
+
+* new functions for detecting _blank_ values in a vector or `data.frame`.  _Blank_ values are those which do not contain any text (controls for `NA`) or are entirely white space.
+  * `is_blank()` for detecting _blank_ values in a vector
+  * `is_blank_cols()` for detecting _blank_ columns
+  * `select_blank_cols()` for selecting _blank_ columns
+  * `remove_blank_cols()` for removing _blank_ columns
+* `match_param()` now accepts a named listed for alias matching [#104](https://github.com/jmbarbone/mark/issues/104)
+* `echo()` evaluates expressions and logs outputs [#164](https://github.com/jmbarbone/mark/issues/164)
+* `{fuj}` is now imported
+  * multiple functions now re-exported from `{fuj}` (see `?mark::reexports`)
+  * `set_names0()` is deprecated in favor of `set_names()`
+  * error messages are created with `fuj::new_condition()`;
+  * test for errors and warnings enhanced with class checks
+
+## Fixes and updates
+
+* `date_from_partial()` works again [#155](https://github.com/jmbarbone/mark/issues/155) after fixing an issue with an internal utility `is_valid_date_string()` that wasn't recognizing `%Y-%m-%d` (and potentially others)
+* `lintr` GitHub action updated [#173](https://github.com/jmbarbone/mark/issues/173); this includes plenty of internal improvements and code cleanup
+* package description in help files corrected [#165](https://github.com/jmbarbone/mark/issues/165)
+* GitHub pages updated with latest `{pkgdown}` action [#175](https://github.com/jmbarbone/mark/issues/175)
+* Update to GitHub R-CMD-check action [#178](https://github.com/jmbarbone/mark/issues/178)
+* `switch_in_case()` handles `NA`s better [#183](https://github.com/jmbarbone/mark/issues/183)
+* internal `switch` tests updated for `{waldo}` development [#182](https://github.com/jmbarbone/mark/pulls/182) thanks, `@hadley`
+* methods for `write_clipboard()` are now displayed in documentation [#186](https://github.com/jmbarbone/mark/issues/182)
+
 # mark 0.5.3
 
 * CRAN fix for new release [#151](https://github.com/jmbarbone/mark/issues/151)

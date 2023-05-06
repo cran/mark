@@ -8,10 +8,7 @@
 #' @export
 
 get_recent_dir <- function(x = ".",  ...) {
-  if (!dir.exists(x)) {
-    stop("Directory not found", call. = FALSE)
-  }
-
+  stopifnot(dir.exists(x))
   dirs <- list_dirs(x, ...)
   newest_dir(dirs)
 }
@@ -27,14 +24,28 @@ get_recent_dir <- function(x = ".",  ...) {
 #' @return A full path to a directory
 #' @export
 
-get_dir_recent_date <- function(x = ".", dt_pattern = NULL, dt_format = NULL, all = FALSE) {
+get_dir_recent_date <- function(
+    x = ".",
+    dt_pattern = NULL,
+    dt_format = NULL,
+    all = FALSE
+) {
   dt_pattern <- dt_pattern %||% .default_dt_pattern
   dt_format <- dt_format %||% .default_dt_format
   dirs <- list_dirs(x, pattern = dt_pattern, basename = TRUE, all = all)
-  dirs[which.max(sapply(basename(dirs), as.POSIXct, tryFormats = dt_format, optional = TRUE))]
+  ind <- sapply(
+    basename(dirs),
+    as.POSIXct,
+    tryFormats = dt_format,
+    optional = TRUE
+  )
+  dirs[which.max(ind)]
 }
 
-.default_dt_pattern <- "^[[:digit:]]{4}.?[[:digit:]]{2}.?[[:digit:]]{2}.?[[:digit:]]{2}.?[[:digit:]]{2}.?[[:digit:]]{2}(.?[PA]M)?$"
+.default_dt_pattern <- paste0(
+  "^[[:digit:]]{4}.?[[:digit:]]{2}.?[[:digit:]]{2}.?[[:digit:]]{2}",
+  ".?[[:digit:]]{2}.?[[:digit:]]{2}(.?[PA]M)?$"
+)
 
 .default_dt_format <- c(
   "%Y-%m-%d %H %M %S",
@@ -47,7 +58,8 @@ get_dir_recent_date <- function(x = ".", dt_pattern = NULL, dt_format = NULL, al
 
 #' Get recent directory by number name
 #'
-#' Finds the directory where the number is the greatest.  This can be useful for when folders are created as run IDs.
+#' Finds the directory where the number is the greatest.  This can be useful for
+#' when folders are created as run IDs.
 #'
 #' @param x The directory to look in
 #' @return A full path to a directory
@@ -71,9 +83,7 @@ get_dir_max_number <- function(x) {
 #' @export
 
 get_recent_file <- function(x, exclude_temp = TRUE, ...) {
-  if (!is_dir(x)) {
-    stop("Directory not found", call. = FALSE)
-  }
+  stopifnot(is_dir(x))
 
   files <- list_files(x, ...)
 
@@ -82,7 +92,7 @@ get_recent_file <- function(x, exclude_temp = TRUE, ...) {
   }
 
   if (no_length(files)) {
-    stop("No files found", call. = FALSE)
+    stop(cond_get_recent_file_none())
   }
 
   newest_file(files)
@@ -106,18 +116,13 @@ remove_temp_files <- function(x) {
 #' @export
 
 norm_path <- function(x = ".", check = FALSE, remove = check) {
-  if (!is.character(x)) {
-    stop("x (path) must be a character vector", call. = FALSE)
-  }
+  stopifnot(is.character(x))
 
   paths <- normalizePath(x, winslash = .Platform$file.sep, mustWork = FALSE)
   ind <- !file.exists(paths)
 
   if (check && any(ind)) {
-    warning("Paths not found:\n  '",
-            collapse0(paths[ind], sep = "'\n  '"),
-            "'",
-            call. = FALSE)
+    warning(cond_norm_path_found(paths[ind]))
   }
 
   if (remove) {
@@ -240,15 +245,19 @@ file_open <- open_file
 shell_exec <- function(x) {
   open_fun <- switch(
     Sys.info()[["sysname"]],
-    Windows = shell.exec,
+    Windows = shell.exec, # nolint: object_usage_linter.
     Linux   = function(file) system2("xdg-open", shQuote(file, "sh")),
     Darwin  = function(file) system2("xdg-open", shQuote(file, "sh")),
-    stop("sysname not recognized: ", Sys.info()[["sysname"]])
+    stop(cond_shell_exec(Sys.info()[["sysname"]]))
   )
 
   open_fun <- match.fun(open_fun)
   x <- norm_path(x, check = TRUE)
-  FUN <- function(file) inherits(try(open_fun(x), silent = TRUE), "try-error")
+
+  FUN <- function(file) { # nolint: object_name_linter.
+    inherits(try(open_fun(x), silent = TRUE), "try-error")
+  }
+
   invisible(!vap_lgl(x, FUN))
 }
 
@@ -304,15 +313,33 @@ list_files <- function(
   }
 
   if (basename) {
-    files[grep(pattern, basename(files), ignore.case = ignore_case, invert = negate)]
+    files[grep(
+      pattern,
+      basename(files),
+      ignore.case = ignore_case,
+      invert = negate
+    )]
   } else {
-    grep(pattern, files, ignore.case = ignore_case, value = TRUE, invert = negate)
+    grep(
+      pattern,
+      files,
+      ignore.case = ignore_case,
+      value = TRUE,
+      invert = negate
+    )
   }
 }
 
 #' @rdname file_utils
 #' @export
-list_dirs <- function(x = ".", pattern = NULL, ignore_case = FALSE, all = FALSE, basename = FALSE, negate = FALSE) {
+list_dirs <- function(
+    x = ".",
+    pattern = NULL,
+    ignore_case = FALSE,
+    all = FALSE,
+    basename = FALSE,
+    negate = FALSE
+) {
   path <- norm_path(x, check = TRUE)
 
   if (length(path) == 1L && is.na(path)) {
@@ -332,9 +359,20 @@ list_dirs <- function(x = ".", pattern = NULL, ignore_case = FALSE, all = FALSE,
   }
 
   if (basename) {
-    dirs[grep(pattern, basename(dirs), ignore.case = ignore_case, invert = negate)]
+    dirs[grep(
+      pattern,
+      basename(dirs),
+      ignore.case = ignore_case,
+      invert = negate
+    )]
   } else {
-    grep(pattern, dirs, ignore.case = ignore_case, value = TRUE, invert = negate)
+    grep(
+      pattern,
+      dirs,
+      ignore.case = ignore_case,
+      value = TRUE,
+      invert = negate
+    )
   }
 }
 
@@ -351,10 +389,7 @@ list_dirs <- function(x = ".", pattern = NULL, ignore_case = FALSE, all = FALSE,
 #' @export
 
 is_dir <- function(x) {
-  if (no_length(x) || !is.character(x)) {
-    stop("x must be a character vector with at least 1 element", call. = FALSE)
-  }
-
+  stopifnot(!no_length(x), is.character(x))
   dir.exists(x)
 }
 
@@ -362,10 +397,7 @@ is_dir <- function(x) {
 #' @rdname is_dir
 #' @export
 is_file <- function(x) {
-  if (no_length(x) || !is.character(x)) {
-    stop("x must be a character vector with at least 1 element", call. = FALSE)
-  }
-
+  stopifnot(!no_length(x), is.character(x))
   isdir <- file.info(x, extra_cols = FALSE)$isdir
   !is.na(isdir) & !isdir
 }
@@ -373,9 +405,7 @@ is_file <- function(x) {
 file_create <- function(x, overwrite = FALSE) {
   dirs <- is_dir(x)
   if (any(dirs)) {
-    warning("Cannot create files that are directories:",
-            paste0("\n   ", norm_path(x[dirs])),
-            call. = FALSE)
+    warning(cond_file_create_dir(x[dirs]))
     x <- x[!dirs]
   }
 
@@ -433,7 +463,12 @@ file_name <- function(x, compression = FALSE) {
 #' add_file_timestamp(file2)
 #'
 #' file.remove(file1, file2)
-add_file_timestamp <- function(x, ts = Sys.time(), format = "%Y-%m-%d %H%M%S", sep = " ") {
+add_file_timestamp <- function(
+    x,
+    ts = Sys.time(),
+    format = "%Y-%m-%d %H%M%S",
+    sep = " "
+) {
   if (!is.null(format)) {
     ts <- format(ts, format = format)
   }
@@ -442,9 +477,42 @@ add_file_timestamp <- function(x, ts = Sys.time(), format = "%Y-%m-%d %H%M%S", s
   ext <- tools::file_ext(x)
 
   if (length(sep) > 1) {
-    warning("sep collapsed", call. = FALSE)
     sep <- collapse0(sep)
   }
 
   file.path(dirname(x), paste0(bn, sep, ts, if (ext != "") ".", ext))
 }
+
+# conditions --------------------------------------------------------------
+
+cond_get_recent_file_none <- function() {
+  new_condition("No files found", "get_recent_file_none")
+}
+
+cond_norm_path_found <- function(paths) {
+  new_condition(
+    paste0("Paths not found:\n  '", collapse(paths, sep = "'\n  '"), "'"),
+    "norm_path_found",
+    type = "warning"
+  )
+}
+
+cond_shell_exec <- function(x) {
+  new_condition(
+    paste0("sysname not recognized:", toString(x)),
+    "shell_exec_sysname"
+  )
+}
+
+cond_file_create_dir <- function(x) {
+  new_condition(
+    paste0(
+      "Cannot create files that are directories:",
+      paste0("\n   ", norm_path(x))
+    ),
+    "file_create_dir",
+    type = "warning"
+  )
+}
+
+# terminal line

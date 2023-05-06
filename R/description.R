@@ -10,13 +10,10 @@
 #' @export
 
 use_author <- function(author_info = find_author()) {
-  if (!is.list(author_info)) {
-    stop("author_info must be a list", call. = FALSE)
-  }
-
-  if (inherits(author_info, "person")) {
-    stop("author_info should not be a person object", call. = FALSE)
-  }
+  stopifnot(
+    is.list(author_info),
+    !inherits(author_info, "person")
+  )
 
   lines <- readLines("DESCRIPTION")
   start <- grep("^[Aa]uthor", lines)
@@ -62,21 +59,18 @@ author_info_to_text <- function(x) {
 
   ind <- !comment & len
   x[ind] <- paste0('"', x[ind], '"')
-  x[comment] <-  paste0("c(", names(x[comment][[1]]), " = ",  paste0('"', x[comment][1], '"'), ")")
+  x[comment] <-  paste0(
+    "c(",
+    names(x[comment][[1]]),
+    " = ",
+    paste0('"', x[comment][1], '"'), ")"
+  )
 
   paste0(format(nm, width = width), " = ", x, ",")
 }
 
 find_author <- function() {
-  getOption(
-    "mark.author",
-    stop(
-      "Author information not found in options.\n",
-      "You can set the author information with options(mark.author = .)\n",
-      "  probably within an .Rprofile",
-      call. = FALSE
-    )
-  )
+  getOption("mark.author", stop(cond_find_author()))
 }
 
 # Version -----------------------------------------------------------------
@@ -85,27 +79,31 @@ find_author <- function() {
 #'
 #' Get and bump package version for dates
 #'
-#' @description
-#' Will read the `DESCRIPTION` file and to get and adjust the version
+#' @description Will read the `DESCRIPTION` file and to get and adjust the
+#' version
 #'
 #' `bump_date_version()` will not check if the version is actually a date.  When
-#'  the current version is the same as today's date(equal by character strings)
-#'  it will append a `.1`.
+#' the current version is the same as today's date(equal by character strings)
+#' it will append a `.1`.
 #'
 #' @param version A new version to be added; default of `NULL` will
 #'   automatically update.
 #' @param date If `TRUE` will use a date as a version.
 #' @return
 #' * `get_version()`: A package_version
-#' * `bump_version()`, `bump_date_version()`, `update_version()`: None, called for its side-effects
+#' * `bump_version()`: None, called for its side-effects
+#' * `bump_date_version()`: None, called for its side-effects
+#' * `update_version()`: None, called for its side-effects
 #'
 #' @export
 get_version <- function() {
   description <- readLines("DESCRIPTION")
   line <- grep("^[Vv]ersion.*[[:punct:][:digit:]]+$", description)
+
   if (length(line) != 1L) {
-    stop("multiple version found", call. = FALSE)
+    stop(cond_version_lines())
   }
+
   as.package_version(gsub("[Vv]ersion|[:]|[[:space:]]", "", description[line]))
 }
 
@@ -131,7 +129,7 @@ update_version <- function(version = NULL, date = FALSE) {
   line <- grep("^[Vv]ersion.*[[:punct:][:digit:]]+$", description)
 
   if (length(line) != 1L) {
-    stop("multiple version found", call. = FALSE)
+    stop(cond_version_lines())
   }
 
   # Get the old version
@@ -165,7 +163,7 @@ update_version <- function(version = NULL, date = FALSE) {
   }
   # nocov end
 
-  if (identical(men, 1L) | isNA(getOption("mark.check_interactive"))) {
+  if (identical(men, 1L) || isNA(getOption("mark.check_interactive"))) {
     foo()
   }
 
@@ -209,7 +207,29 @@ today_as_version <- function(zero = FALSE) {
   char <- if (zero) {
     paste(0, x[["year"]] + 1900, x[["mon"]] + 1, x[["mday"]], sep = ".")
   } else {
-    paste( x[["year"]] + 1900, x[["mon"]] + 1, x[["mday"]], sep = ".")
+    paste(   x[["year"]] + 1900, x[["mon"]] + 1, x[["mday"]], sep = ".") # nolint: spaces_inside_linter, line_length_linter.
   }
   as.package_version(char)
 }
+
+# conditions --------------------------------------------------------------
+
+cond_find_author <- function() {
+  new_condition(
+    paste0(
+      "Author information not found in options.\n",
+      "You can set the author information with options(mark.author = .)\n",
+      "  probably within an .Rprofile"
+    ),
+    "find_author"
+  )
+}
+
+cond_version_lines <- function() {
+  new_condition(
+    "multiple versions found",
+    "get_version_lines"
+  )
+}
+
+# terminal line

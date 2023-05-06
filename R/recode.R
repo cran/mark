@@ -1,3 +1,5 @@
+# nolint start: line_length_linter.
+
 #' Recode by
 #'
 #' A simple implementation of recoding
@@ -36,8 +38,9 @@
 #' @seealso [dplyr::recode()]
 #' @export
 
-recode_by <- function(x, by, vals = NULL, mode = "any") {
+# nolint end: line_length_linter.
 
+recode_by <- function(x, by, vals = NULL, mode = "any") {
   if (is.factor(x)) {
     levels(x) <- recode_by(levels(x), by = by, vals = vals, mode = mode)
     return(x)
@@ -50,7 +53,7 @@ recode_by <- function(x, by, vals = NULL, mode = "any") {
   vals <- vals %||% names(by)
 
   if (is.null(vals)) {
-    stop("values to recode by were not properly set", call. = FALSE)
+    stop(cond_recode_values())
   }
 
   if (length(vals) == 1) {
@@ -76,7 +79,7 @@ recode_only <- function(x, by, vals = NULL) {
   vals <- vals %||% names(by)
 
   if (is.null(vals)) {
-    stop("values to recode by were not properly set", call. = FALSE)
+    stop(cond_recode_values())
   }
 
   if (is.list(vals)) {
@@ -117,4 +120,14 @@ clean_na_coercion <- function(expr) {
   }
 
   res
+}
+
+
+# conditions --------------------------------------------------------------
+
+cond_recode_values <- function() {
+  new_condition(
+    "values to recode by were not properly set",
+    "recode_values"
+  )
 }

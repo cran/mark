@@ -20,34 +20,41 @@
 #'
 #' @export
 
-todos <- function(pattern = NULL, path = ".", force = getOption("mark.todos.force", FALSE), ...) {
+todos <- function(
+    pattern = NULL,
+    path = ".",
+    force = getOption("mark.todos.force", FALSE),
+    ...
+) {
   do_todo("todo", pattern = pattern, path = path, force = force, ...)
 }
 
 #' @rdname todos
 #' @export
-fixmes <- function(pattern = NULL, path = ".", force = getOption("mark.todos.force", FALSE), ...) {
+fixmes <- function(
+    pattern = NULL,
+    path = ".",
+    force = getOption("mark.todos.force", FALSE),
+    ...
+) {
   do_todo("fixme", pattern = pattern, path = path, force = force, ...)
 }
 
-do_todo <- function(text, pattern = NULL, path = path, force = FALSE, ...) {
+do_todo <- function(text, pattern = NULL, path = path, force = FALSE, ...) { # nolint: cyclocomp_linter, line_length_linter.
   # fs::dir_ls() would be a lot quicker but would be a new dependency
 
   if (missing(path) || length(path) != 1 || !is.character(path)) {
-    stop("path must be a character vector of length 1L", call. = FALSE)
+    stop(cond_do_todo_path())
   }
 
-  if (!file.exists(path)) {
-    stop("path not found: ", path, call. = FALSE)
-  }
-
-  if (length(text) != 1L) {
-    stop("Length of text must be 1", call. = FALSE)
-  }
+  stopifnot(file.exists(path), length(text) == 1L)
 
   files <- if (is_dir(path)) {
     # when will path be "" ?  cusing nzchar() instead
-    if (!has_char(path) | !(force | length(list.files(path, pattern = "\\.Rproj$")))) {
+    if (
+      !has_char(path) ||
+      !(force || length(list.files(path, pattern = "\\.Rproj$")))
+    ) {
       message("Did not search for TODOS in ", norm_path(path))
       return(invisible(NULL))
     }
@@ -61,8 +68,9 @@ do_todo <- function(text, pattern = NULL, path = path, force = FALSE, ...) {
     )
   } else {
     if (!grepl(path, pattern = "\\.r(md)?$", ignore.case = TRUE)) {
-      stop("path is not a .R or .Rmd file", .call = FALSE)
+      stop(cond_do_todo_path_r())
     }
+
     path
   }
 
@@ -77,7 +85,6 @@ do_todo <- function(text, pattern = NULL, path = path, force = FALSE, ...) {
     }
   )
 
-  # names(finds) <- substr(files, path_n, vap_int(files, nchar))
   names(finds) <- files
   finds <- finds[vap_int(finds, nrow) > 0L]
 
@@ -88,7 +95,7 @@ do_todo <- function(text, pattern = NULL, path = path, force = FALSE, ...) {
 
   out <- quick_df(c(
     file = list(rep(names(finds), vap_int(finds, nrow))),
-    set_names0(as.list(Reduce(rbind, finds)), c("line", text))
+    set_names(as.list(Reduce(rbind, finds)), c("line", text))
   ))[, c("line", "file", text)]
 
   ind <- grepl("\\.rmd$", out[["file"]], ignore.case = TRUE)
@@ -106,7 +113,7 @@ do_todo <- function(text, pattern = NULL, path = path, force = FALSE, ...) {
 
   if (!is.null(pattern)) {
     out <- out[grep(pattern, out[[text]], value = FALSE, ...), ]
-    attr(out, "row.names") <- seq_along(attr(out, "row.names"))
+    attr(out, "row.names") <- seq_along(attr(out, "row.names")) # nolint: object_name_linter, line_length_linter.
   }
 
   if (nrow(out) == 0L) {
@@ -154,4 +161,14 @@ print.todos_df <- function(x, ...) {
   }
 
   invisible(x)
+}
+
+# conditions --------------------------------------------------------------
+
+cond_do_todo_path <- function() {
+  new_condition("path must be a character vector of length 1L", "do_todo_path")
+}
+
+cond_do_todo_path_r <- function() {
+  new_condition("path is not a .R or .Rmd file", "do_todo_path_r")
 }

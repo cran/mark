@@ -8,9 +8,9 @@ test_that("insert.default() works", {
   exp <- c("z", "a", "b", "z", "c", "d")
   expect_identical(res, exp)
 
-  expect_error(insert(1, NA, 1))
-  expect_error(insert(1, integer(), 1))
-  expect_error(insert(1, 1, integer()))
+  expect_error(insert(1, NA, 1), class = "simpleError")
+  expect_error(insert(1, integer(), 1), class = "insertNposError")
+  expect_error(insert(1, 1, integer()), class = "insertLengthError")
 })
 
 test_that("insert.data.frame() works", {
@@ -26,9 +26,6 @@ test_that("insert.data.frame() works", {
     b = c("a", "b", "c"),
     c = c(-1.5, 0, 1.5)
   )
-
-  # debugonce(insert)
-  # debugonce(append0.list)
 
   res <- insert(x, 2, list(x = 1:3))
   expect_identical(res, exp)

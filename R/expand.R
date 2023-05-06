@@ -17,7 +17,12 @@
 #' expand_by(x, y, "intersect")
 #' expand_by(x, y, "both")
 #' @export
-expand_by <- function(x, y, expand = c("x","y", "intersect", "both"), sort = FALSE) {
+expand_by <- function(
+    x,
+    y,
+    expand = c("x", "y", "intersect", "both"),
+    sort = FALSE
+) {
   expand <- match_param(expand)
   if (!is_named(x)) names(x) <- x
   if (!is_named(y)) names(y) <- y
@@ -76,8 +81,8 @@ expand_by <- function(x, y, expand = c("x","y", "intersect", "both"), sort = FAL
 #' Reindexes a data.frame with a reference
 #'
 #' @param x A data.frame
-#' @param index The column name or number of an index to use; if `NULL` will assume the
-#'   first column; a value of `row.names` will use `row.names(x)`
+#' @param index The column name or number of an index to use; if `NULL` will
+#'   assume the first column; a value of `row.names` will use `row.names(x)`
 #' @param new_index A column vector of the new index value
 #' @param expand Character switch to expand or keep only the values that
 #'   intersect (none), all values in x or index, or retain all values found.
@@ -96,7 +101,13 @@ expand_by <- function(x, y, expand = c("x","y", "intersect", "both"), sort = FAL
 #' reindex(iris1, "index", seq(2, 8, 2))
 #' reindex(iris1, "index", seq(2, 8, 2), expand = "both")
 #' @export
-reindex <- function(x, index = NULL, new_index, expand = c("intersect", "both"),  sort = FALSE) {
+reindex <- function(
+    x,
+    index = NULL,
+    new_index,
+    expand = c("intersect", "both"),
+    sort = FALSE
+) {
   expand <- match_param(expand)
 
   if (!inherits(x, "data.frame")) {
@@ -116,19 +127,18 @@ reindex <- function(x, index = NULL, new_index, expand = c("intersect", "both"),
   }
 
   if (anyNA(xi)) {
-    warning("NA values detected in index this may cause errors with expansion",
-            call. = FALSE)
+    warning(cond_reindex_na())
   }
 
   if (is.null(xi)) {
-    stop("x[[index]] returned `NULL`", call. = FALSE)
+    stop(cond_reindex_index())
   }
 
   ro <- expand_by(xi, new_index, expand = expand, sort = sort)
 
   nm <- names(ro)
   out <- x[nm, ]
-  attr(out, "row.names") <- nm
+  attr(out, "row.names") <- nm # nolint: object_name_linter
   out
 }
 
@@ -149,3 +159,19 @@ unique_name_check <- function(x) {
 
   invisible(TRUE)
 }
+
+# conditions --------------------------------------------------------------
+
+cond_reindex_na <- function() {
+  new_condition(
+    "NA values detected in index this may cause errors with expansion",
+    "reindex_na",
+    type = "warning"
+  )
+}
+
+cond_reindex_index <- function() {
+  new_condition("x[[index]] returned `NULL`", "reindex_index")
+}
+
+# terminal line

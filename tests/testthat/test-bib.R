@@ -14,11 +14,10 @@ test_that("read_bib()", {
 
   temp <- tempfile()
   writeLines("bad", temp)
-  expect_error(read_bib(temp), "No entries")
+  expect_error(read_bib(temp), class = "readBibEntriesError")
 
-
-  expect_error(as_bib(1:3), "data.frame")
-  expect_error(as_bib_list(1:3), "list")
+  expect_error(as_bib(1:3), "data.frame", class = "asBibClassError")
+  expect_error(as_bib_list(1:3), "list",  class = "asBibListClassError")
 
   expect_error(
     process_bib_dataframe(
@@ -26,7 +25,8 @@ test_that("read_bib()", {
       values = 1,
       fields = "this",
       keys = "key"
-    )
+    ),
+    class = "processBibDataframeDupeError"
   )
 })
 
@@ -41,7 +41,6 @@ test_that("snapshots()", {
 })
 
 test_that("= inside text [#117]", {
-  # debug(get_bib_values)
   res <- read_bib(textConnection("
     @article{key,
     author     = {Barbone, Jordan Mark},

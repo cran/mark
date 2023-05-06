@@ -61,8 +61,6 @@ counts.default <- function(x, sort = FALSE, ...) {
   out
 }
 
-# x <- structure(c(2L, NA, 3L, NA, NA, 3L, NA, NA, 1L, 1L), .Label = c("2", "4", "1", "0"), class = "factor")
-
 #' @export
 counts.factor <- function(x, ...) {
   x <- fact(x)
@@ -70,7 +68,7 @@ counts.factor <- function(x, ...) {
   x <- seq_along(lvl)[x]
   n <- length(lvl)
   x[is.na(x)] <- n
-  set_names0(tabulate(x, n), lvl)
+  set_names(tabulate(x, n), lvl)
 }
 
 #' @export
@@ -78,7 +76,7 @@ counts.logical <- function(x, ...) {
   fs <- sum(!x, na.rm = TRUE)
   ts <- sum(x, na.rm = TRUE)
   ns <- sum(is.na(x), na.rm = TRUE)
-  out <- set_names0(c(fs, ts, ns), c(FALSE, TRUE, NA))
+  out <- set_names(c(fs, ts, ns), c(FALSE, TRUE, NA))
   out[out != 0L]
 }
 
@@ -109,7 +107,7 @@ props <- function(x, ...) {
 #' @rdname counts
 #' @export
 #' @param na.rm If `TRUE` will remove NA values from proportions
-props.default <- function(x, sort = FALSE, na.rm = FALSE, ...) {
+props.default <- function(x, sort = FALSE, na.rm = FALSE, ...) { # nolint: object_name_linter, line_length_linter.
   res <- counts(x, sort = sort)
 
   n <- length(res)
@@ -128,7 +126,7 @@ props.data.frame <- function(
   x,
   cols,
   sort = FALSE,
-  na.rm = FALSE,
+  na.rm = FALSE, # nolint: object_name_linter.
   ...,
   .name = "prop"
 ) {
@@ -142,7 +140,9 @@ props.data.frame <- function(
       na_ind <- if (na.rm) which(!stats::complete.cases(values))
       props_n(values, sort = sort, name = .name, na_ind = na_ind)
     } else {
-      vector2df(props(x[[cols]], sort = sort, na.rm = na.rm), cols, .name %||% "prop")
+      vector2df(
+        props(x[[cols]], sort = sort, na.rm = na.rm), cols, .name %||% "prop"
+      )
     }
 
   remake_df(out, x[, cols, drop = FALSE])
@@ -164,7 +164,7 @@ counts_n <- function(x, name = "freq", sort = FALSE) {
   len <- length(res)
   non_dupe <- !duplicated(ints, nmax = len)
   out <- x[non_dupe, ]
-  attr(out, "row.names") <- 1:len
+  attr(out, "row.names") <- seq_len(len) # nolint: object_name_linter.
 
   cn <- colnames(x)
   colnames(out) <- cn
@@ -178,7 +178,7 @@ counts_n <- function(x, name = "freq", sort = FALSE) {
 props_n <- function(
   x,
   sort = FALSE,
-  na.rm = FALSE,
+  na.rm = FALSE, # nolint: object_name_linter.
   name = "props",
   na_ind = NULL
 ) {
