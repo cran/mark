@@ -1,7 +1,7 @@
-c0ce5879cd5aca864b926bbd34268b12 *DESCRIPTION
+7e73b9e5e7107849612c7d2c3572cade *DESCRIPTION
 4434a1ec4fc39bd0d080612f5e40be41 *LICENSE
 2b87b81edbf2fa3b6678aa66ea5cce85 *NAMESPACE
-9a4170ff7925a52a1ada5fb0e3b3af6d *NEWS.md
+b18d186b70d8f2039342f2dad27578a2 *NEWS.md
 1cb06da8eab422d20bfac1c8d1e82f41 *R/aaa.R
 2c385f1486bd1d440c4d2418e5a31620 *R/append.R
 b83cf01fe91e56ea1cd327ff63737a8b *R/apply.R
@@ -68,7 +68,7 @@ ae3bf6b9ad301d905bef21bad22e5fda *R/system-file.R
 3e45a911a3b9f1b6362455cf641ba87e *R/unlist.R
 e988c46301d2ede0d36cf3833ab8a24c *R/utils.R
 a5f989989b14ac5f4dde9a757485346f *R/zzz.R
-bbc180786d0b23da5b4d700dbfe14f4f *README.md
+22683e5e5d452819652cfe7dd0eeb468 *README.md
 d0ed9bd975f1e81813cd454a7fd5cafa *inst/WORDLIST
 65522acad1d26a6800156876be8b6615 *inst/extdata/example-bib.txt
 9a0b08e56e63cc6144760c18d18f602a *man/add_file_timestamp.Rd
@@ -143,7 +143,7 @@ d3e44c65afcbf42a6b30065b7c5a9c5c *man/print.mark_bib_df.Rd
 c79156ee3d24bc2c006aebb8da14ce83 *man/range2.Rd
 1e0cac83883df0eafaff40f092377ef5 *man/read_bib.Rd
 389f2a2db2bafdb17745ea3ba7fb4c8f *man/recode_by.Rd
-aebbd31fc520b0c03154c60afa30a04e *man/reexports.Rd
+d6a13135af2cc76405c042e34157a801 *man/reexports.Rd
 73a145d724172a36d41cc2d9a2d1c133 *man/reindex.Rd
 2baa634440f1d091d882a53178c2e61d *man/remove_na.Rd
 609d1b9989a974404d750266cee30c79 *man/remove_null.Rd
@@ -176,8 +176,9 @@ b2baf35d5e7ff04461d33068b80867aa *man/use_author.Rd
 ff0a0e9c156f4ba707b0a7631b755add *man/within_call.Rd
 6286c40603df000aaae222467ae8cd76 *tests/spelling.R
 0348e9ca2ce88a837f0fdea8a0fe3c9d *tests/testthat.R
-f557c8a56d00b39c3ae277eea2ec5a6c *tests/testthat/Rplots.pdf
+7f9233bf3bd62b495aaede358f216609 *tests/testthat/Rplots.pdf
 c6e17448cab5685c23001282fe21702f *tests/testthat/_snaps/bib.md
+4e8aa1ba30cd6cf2bec61ebc421ca42f *tests/testthat/_snaps/diff-time.md
 bd323be890f82d3ab831e713fb6bd2ef *tests/testthat/_snaps/fact.md
 83bfaeaf1011b7a72d23b01b9d876e7a *tests/testthat/_snaps/handlers.md
 7de978734c9017cacf39fda2137b7a9e *tests/testthat/_snaps/note.md
@@ -206,7 +207,7 @@ d4b51f4514fb4898b715b432766c5d8d *tests/testthat/test-dataframes.R
 053da73becc3caceac87bf9c710df3d2 *tests/testthat/test-depth.R
 3b2e40c3de058f5601f3a8a506d4ecbe *tests/testthat/test-description.R
 1500f40a34026ef5c950f2afefac5538 *tests/testthat/test-detail.R
-c3f15a1d8aeac442da2b5b9236e6e33d *tests/testthat/test-diff-time.R
+ebc512d3d8402c764dac29e4db4bd116 *tests/testthat/test-diff-time.R
 080a3e78e3029718c1e18ea890a986ac *tests/testthat/test-directory.R
 2b4f4f10db676f37591a18335ca8a667 *tests/testthat/test-environments.R
 067ef108fc5a30e76261d39767c7e689 *tests/testthat/test-expand.R
