@@ -36,3 +36,40 @@ test_that("between_more() works", {
     class = "betweenMoreLrWarning"
   )
 })
+
+
+test_that("within()", {
+  x <- 1:20
+  ss <- x >= 5 & x <= 10
+  sr <- x >= 5 & x <  10
+  rs <- x >  5 & x <= 10
+  rr <- x >  5 & x <  10
+
+  expect_equal(within(x, 5, 10, "[]"), ss)
+  expect_equal(within(x, 5, 10, "[)"), sr)
+  expect_equal(within(x, 5, 10, "(]"), rs)
+  expect_equal(within(x, 5, 10, "()"), rr)
+
+  # vectors for left or right
+
+  x <- 1:5
+  left <- c(2, 2, 3, 2, 4)
+  right <- c(3, 3, 4, 3, 4)
+
+  res <- c(FALSE, TRUE, TRUE, TRUE, TRUE)
+  expect_identical(within(x, left), res)
+
+  res <- c(FALSE, FALSE, TRUE, FALSE, FALSE)
+  expect_identical(within(x, 3, right), res)
+
+  res <- c(FALSE, TRUE, TRUE, FALSE, FALSE)
+  expect_identical(within(x, left, right), res)
+
+  expect_identical(within(x), x)
+
+  expect_warning(
+    within(1:2, 3, 2),
+    "`left` > `right`",
+    class = "withinLrWarning"
+  )
+})
