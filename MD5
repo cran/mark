@@ -1,7 +1,7 @@
-f4867fdae5c8630578fede3f6a643e7b *DESCRIPTION
+45439a6b6f6c8cc20a9b8c68bbbd6e45 *DESCRIPTION
 4434a1ec4fc39bd0d080612f5e40be41 *LICENSE
-d14918251a437e24fcb65c16bbe3c0cf *NAMESPACE
-47ad5708aed82d23911659aad1d34b32 *NEWS.md
+b8f2d7f95b151950a58635b2b820d8d1 *NAMESPACE
+8ad1ef5a5b9206bc3077d9bdb2f47383 *NEWS.md
 1cb06da8eab422d20bfac1c8d1e82f41 *R/aaa.R
 2c385f1486bd1d440c4d2418e5a31620 *R/append.R
 b83cf01fe91e56ea1cd327ff63737a8b *R/apply.R
@@ -11,7 +11,7 @@ ec829f72844e8d745647945b246473fb *R/array.R
 a790bc7af89b06c5b3425a62f527d8fb *R/blank.R
 40fdf255b0ccc87f54e07920e44c3f31 *R/boolean.R
 61db176dbfc51b1c15eaa8774919d432 *R/char2fact.R
-8e406e7238a2b15346e8426f5d4e5c20 *R/clipboard.R
+20a198691eaab593802280b55033b448 *R/clipboard.R
 058845ed36f17d3ce7118141b81fd0fe *R/counts.R
 bd7d207712d5d073c6270feadc109f30 *R/dataframes.R
 a59706f05eb5474e787377170bc4fdd2 *R/dates.R
@@ -73,7 +73,7 @@ b03f8148f51cf5a193b934f86684d172 *R/todos.R
 136082d71fd17b2d9d2a784ee720e824 *R/within.R
 0ad67e320e8d9d69bf4770ea9739040e *R/write.R
 9b28ba9c74e3b1e02ed9c3d22f572200 *R/zzz.R
-7f756cf6fd6dd251c8406aaa0ce96d1e *README.md
+e83094e4c8320e18942f1aac2e3a616b *README.md
 4651a5752f0437d566beccf325e1a578 *inst/WORDLIST
 65522acad1d26a6800156876be8b6615 *inst/extdata/example-bib.txt
 9a0b08e56e63cc6144760c18d18f602a *man/add_file_timestamp.Rd
@@ -86,7 +86,7 @@ d373202b1a82f276d9997bd178337c55 *man/base_alpha.Rd
 ca94bf6f529bbab144abdd61761b99ab *man/char2fact.Rd
 85b948f9cb56e67b6baf2e5ba5c1051a *man/checkOptions.Rd
 ba2c0d2bb6cf5683c50eb2968ac6f55f *man/chr_split.Rd
-80f7e7e6ef542098ada3a9a2c26d6865 *man/clipboard.Rd
+285bc80369f5a0ecaac6b528e320cc23 *man/clipboard.Rd
 2bf5f010235d92cd8ee29c1f576dfca1 *man/complete_cases.Rd
 06adb8b524100023e2344cc61c186c4b *man/counts.Rd
 498ae3b6c15557f1cc3533e93a27ad08 *man/date_from_partial.Rd
@@ -187,6 +187,7 @@ ff0a0e9c156f4ba707b0a7631b755add *man/within_call.Rd
 9ee61e78c5cdee1ce087895ac04be798 *man/write_file_md5.Rd
 0622a97a2aaa3c342f09636052c2d7f5 *tests/spelling.R
 0348e9ca2ce88a837f0fdea8a0fe3c9d *tests/testthat.R
+5ba18d7e57e57db8a564e2a87c7497d7 *tests/testthat/Rplots.pdf
 c6e17448cab5685c23001282fe21702f *tests/testthat/_snaps/bib.md
 4e8aa1ba30cd6cf2bec61ebc421ca42f *tests/testthat/_snaps/diff-time.md
 bd323be890f82d3ab831e713fb6bd2ef *tests/testthat/_snaps/fact.md
@@ -211,14 +212,14 @@ bbdc6355c8eb9c5ea62e41e648b173e5 *tests/testthat/test-bib.R
 f210f7e5fa993e9554fe737cc2fb8861 *tests/testthat/test-blank.R
 7d27ebf5aa49c3ed153b0f19f2bf8966 *tests/testthat/test-boolean.R
 ee640d84c3f61bd4b08db195966b26cf *tests/testthat/test-char2fact.R
-28408ce3864897cf5c926b9ee80609e5 *tests/testthat/test-clipboard.R
+3dc1db26305b3577843f2b3fb8f7c40a *tests/testthat/test-clipboard.R
 ed777c8d949cb9af9028d30cc560637e *tests/testthat/test-counts.R
 8df1439fead417ed6d1024029ccd2b08 *tests/testthat/test-dataframes.R
 665cedaf55973101f8b4894fb43ec39b *tests/testthat/test-dates.R
 d8675f6d719572d4ff7f73b129f6a629 *tests/testthat/test-depth.R
 3b2e40c3de058f5601f3a8a506d4ecbe *tests/testthat/test-description.R
 1e9292b1415f7ed70d806fe832cc5f44 *tests/testthat/test-detail.R
-ebc512d3d8402c764dac29e4db4bd116 *tests/testthat/test-diff-time.R
+3612cb7bcddb4e6ec575fd04b16ab112 *tests/testthat/test-diff-time.R
 a9d352f1ec5665ac21b27187165609f8 *tests/testthat/test-directory.R
 180c186ab491a39e9fe1a2a2d95c093d *tests/testthat/test-environments.R
 cd4487931c01b704c3ada603628bc7b8 *tests/testthat/test-expand.R
@@ -261,7 +262,7 @@ ee7eb4d14b5d6fd6b584caa216b75afb *tests/testthat/test-recode.R
 756bfbdef3a1ed4f260db7adc831209d *tests/testthat/test-sort-by.R
 9d54aa6264bfe0615551e2ba93a7e8ac *tests/testthat/test-sourcing.R
 b20b6e6e0bf8d0732bb262be4aa46d8e *tests/testthat/test-stats.R
-ef7ae4733b0aec49978635d906880a03 *tests/testthat/test-strings.R
+4956df48267893c52d7b1d9f7b2166b9 *tests/testthat/test-strings.R
 2df62acf3eda95880bb5da17becb5f80 *tests/testthat/test-struct.R
 29933f35f086832ae2c2d09fbf48a0e2 *tests/testthat/test-switch.R
 ada3a02be16eeb343f0f13e48c980a90 *tests/testthat/test-system-file.R
