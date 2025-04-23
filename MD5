@@ -1,7 +1,7 @@
-45439a6b6f6c8cc20a9b8c68bbbd6e45 *DESCRIPTION
+60e60c35d03c4fd16ced11d54e396311 *DESCRIPTION
 4434a1ec4fc39bd0d080612f5e40be41 *LICENSE
 b8f2d7f95b151950a58635b2b820d8d1 *NAMESPACE
-8ad1ef5a5b9206bc3077d9bdb2f47383 *NEWS.md
+c225c9cd16073fcdac9a79c9b7bd3208 *NEWS.md
 1cb06da8eab422d20bfac1c8d1e82f41 *R/aaa.R
 2c385f1486bd1d440c4d2418e5a31620 *R/append.R
 b83cf01fe91e56ea1cd327ff63737a8b *R/apply.R
@@ -14,17 +14,17 @@ a790bc7af89b06c5b3425a62f527d8fb *R/blank.R
 20a198691eaab593802280b55033b448 *R/clipboard.R
 058845ed36f17d3ce7118141b81fd0fe *R/counts.R
 bd7d207712d5d073c6270feadc109f30 *R/dataframes.R
-a59706f05eb5474e787377170bc4fdd2 *R/dates.R
-4819880c5b7e1831b854f935dd48b34a *R/depth.R
+d2475f80419327ea9bac9fc13e69d95b *R/dates.R
+98798903f2412e19b0eb3d782785cdef *R/depth.R
 b5440e69f187c443babe82d3fd58be05 *R/description.R
-f19fa1eafa0d001a90ea6c3cc63c1ee5 *R/detail.R
+d9442fa6e9e6554a056f8c061f4aa372 *R/detail.R
 9e38d564d9ab569f587948c586509dc3 *R/diff-time.R
 6691353db93a7a88d8c1b85d4696523c *R/directory.R
 d9058ffb1f375d6e71d3fbc0a96cc95f *R/environments.R
 1188bc27364f117f9acfe218b737c1e5 *R/expand.R
-08c322b9fcd3145fbc521637a9dd6a75 *R/fact.R
+989d00551d91d004734b25f4047712d3 *R/fact.R
 e842e8bd8a7ba9d84802ebdcfbe35c64 *R/fct_expand_seq.R
-9499bf8a5f932d6cb7eb6998fde80e9c *R/file.R
+b81c3d1f89906102e876c2c6d8911c15 *R/file.R
 60df7ccf01fd68664d7b750c5b041432 *R/fizzbuzz.R
 427291a18029e163d8d1b69dbb4479ef *R/funs.R
 5b4a07247f6215b2adfafb8f24603ad7 *R/glob.R
@@ -34,7 +34,7 @@ b847cc24d74fbfeb31200220e7952b98 *R/handlers.R
 aded4cf93d515d1da4ec92258960c1cf *R/insert.R
 e804695575708e123b3d046ec57fa9cd *R/labels.R
 621c1bebf170a3fac5919c51a933d24a *R/limit.R
-8cd905ab4bc2ba9f024df257070ee311 *R/lines-of-code.R
+0c131630989414eeaa4562e320ba8b5a *R/lines-of-code.R
 02313c328cc2d8b8d99db5af832dca1f *R/logic.R
 cc345486ce879136fd9b3863cb45c497 *R/map.R
 1f269a8e9329da8267f8d67eb0568728 *R/mark-package.R
@@ -63,10 +63,10 @@ a10a49284d21f092a13d80d9233f2f2b *R/searches.R
 bba0a2b3974396ae72701d1fcb853f02 *R/sourcing.R
 f1afc584078c742088df2b4389e370c1 *R/stats.R
 3737240d1ff57cf7fb19d4a875d10518 *R/strings.R
-587ce9c02d7848fdce6c1bf855aecd3a *R/switch.R
+2c283fe3f517b0bec2f7a6f6907371fb *R/switch.R
 ae3bf6b9ad301d905bef21bad22e5fda *R/system-file.R
-65baa9fc993adfec21c792cbdd0c3f0b *R/time-report.R
-b03f8148f51cf5a193b934f86684d172 *R/todos.R
+bb72aea047ff422b2092361a184db24a *R/time-report.R
+e07c91ffa4443a5c26e51d92dae10eec *R/todos.R
 4a6baff03e2f4021edd219ee63ae414f *R/tryn.R
 0fad4eabaf5c2517a8dd5d11512beb1a *R/unlist.R
 71f273b5caeb5923a93587c48d98c745 *R/utils.R
@@ -187,7 +187,7 @@ ff0a0e9c156f4ba707b0a7631b755add *man/within_call.Rd
 9ee61e78c5cdee1ce087895ac04be798 *man/write_file_md5.Rd
 0622a97a2aaa3c342f09636052c2d7f5 *tests/spelling.R
 0348e9ca2ce88a837f0fdea8a0fe3c9d *tests/testthat.R
-5ba18d7e57e57db8a564e2a87c7497d7 *tests/testthat/Rplots.pdf
+a7018b9dc74589b1623116aae47707a8 *tests/testthat/Rplots.pdf
 c6e17448cab5685c23001282fe21702f *tests/testthat/_snaps/bib.md
 4e8aa1ba30cd6cf2bec61ebc421ca42f *tests/testthat/_snaps/diff-time.md
 bd323be890f82d3ab831e713fb6bd2ef *tests/testthat/_snaps/fact.md
@@ -200,6 +200,7 @@ eaaa2db9f7a47f74381c1f1ed142aef6 *tests/testthat/_snaps/pseudo_id.md
 3c9a50cbc5c47fa08a9417fdb97ea647 *tests/testthat/bib_result.csv
 65522acad1d26a6800156876be8b6615 *tests/testthat/example_bib.txt
 d309e7484a849594486d3a0bd5a9449f *tests/testthat/files/DESCRIPTION
+85df6004024d6dd9610e6ed77d19c232 *tests/testthat/helper.R
 17325b8ea69d36aa23a211fee0810ab3 *tests/testthat/scripts/lines/lines.R
 ccd04c53d1daa035c4d40cb66d8b71c6 *tests/testthat/scripts/lines/more-lines.R
 095ca93fe8f994f82a7145e4f0f6ab54 *tests/testthat/scripts/rscript-test.R
@@ -225,7 +226,7 @@ a9d352f1ec5665ac21b27187165609f8 *tests/testthat/test-directory.R
 cd4487931c01b704c3ada603628bc7b8 *tests/testthat/test-expand.R
 5b3e1dd3ada0123827120ff8549d1464 *tests/testthat/test-fact.R
 7e03ffbbf2f2e99f1a035e1cd2bcd3a0 *tests/testthat/test-fct-expand-seq.R
-f87a1d45da56d86f17ef8340e1301d45 *tests/testthat/test-file.R
+c87210941e8c464af8a4d4a7db5f02a2 *tests/testthat/test-file.R
 637e34ccdf2006976fd03faf3d7b2a34 *tests/testthat/test-fizzbuzz.R
 5520de2516db92eea17681db90183674 *tests/testthat/test-funs.R
 1137b2a1438769e14519354d73d4ba86 *tests/testthat/test-glob.R
@@ -263,7 +264,6 @@ ee7eb4d14b5d6fd6b584caa216b75afb *tests/testthat/test-recode.R
 9d54aa6264bfe0615551e2ba93a7e8ac *tests/testthat/test-sourcing.R
 b20b6e6e0bf8d0732bb262be4aa46d8e *tests/testthat/test-stats.R
 4956df48267893c52d7b1d9f7b2166b9 *tests/testthat/test-strings.R
-2df62acf3eda95880bb5da17becb5f80 *tests/testthat/test-struct.R
 29933f35f086832ae2c2d09fbf48a0e2 *tests/testthat/test-switch.R
 ada3a02be16eeb343f0f13e48c980a90 *tests/testthat/test-system-file.R
 80b3d52f88be2ae9d502d1789937de21 *tests/testthat/test-time-report.R
@@ -271,4 +271,4 @@ eee0bdc2206aa232dc2474c15e6e503a *tests/testthat/test-todos.R
 c8eff2df3a9867cb84fc0f02372e8a8b *tests/testthat/test-unlist.R
 1aaa028d0f3d25a76fe1d80ece761668 *tests/testthat/test-utils.R
 1f41d17c5345c6948048f7ab2e26e20b *tests/testthat/test-within.R
-7d0e714c99a95efbc9a41a908991c9a4 *tests/testthat/test-write.R
+ccf1e64b906266d9b260305df132bc26 *tests/testthat/test-write.R
