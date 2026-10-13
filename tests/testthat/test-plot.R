@@ -1,10 +1,10 @@
 test_that("with_par() works", {
-  skip_if_not(package_available("graphics"))
-  skip_if_not(package_available("grDevices"))
+  skip_if_not(fuj::available_namespace("graphics"))
+  skip_if_not(fuj::available_namespace("grDevices"))
 
   par0 <- graphics::par("mfrow")
   set.seed(42)
-  df <- quick_dfl(a = stats::rnorm(100), b = stats::rnorm(100))
+  df <- dataframe(a = stats::rnorm(100), b = stats::rnorm(100))
   # not testing for plot
   grDevices::dev.off()
   wuffle(with_par(

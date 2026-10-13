@@ -4,9 +4,9 @@
 \name{mark}
 \alias{mark-package}
 \alias{mark}
-\title{mark}
+\title{mark: Multipurpose Aids for R Kit}
 \description{
-Miscellaneous, Analytic R Kernels
+Miscellaneous functions and wrappers for development in other packages created, maintained by Jordan Mark Barbone.
 }
 \seealso{
 Useful links:
@@ -20,5 +20,10 @@ Useful links:
 }
 \author{
 \strong{Maintainer}: Jordan Mark Barbone \email{jmbarbone@gmail.com} (\href{https://orcid.org/0000-0001-9788-3628}{ORCID}) [copyright holder]
+
+Authors:
+\itemize{
+  \item Jordan Mark Barbone \email{jmbarbone@gmail.com} (\href{https://orcid.org/0000-0001-9788-3628}{ORCID}) [copyright holder]
+}
 
 }

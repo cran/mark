@@ -39,19 +39,19 @@ A vector of type matching the intended value in the function name.
 Wrappers for vapply
 }
 \details{
-These are simply wrappers for \code{\link[base:lapply]{base::vapply()}} to shorten lines.
+These are simply wrappers for \code{\link[base:vapply]{base::vapply()}} to shorten lines.
 
 Each function is designed to use specific vector types:
 
 \describe{
-\item{vap_int}{integer}
-\item{vap_dbl}{double}
-\item{vap_chr}{character}
-\item{vap_lgl}{logical}
-\item{vap_cplx}{complex}
-\item{vap_date}{Date}
+\item{\code{\link[=vap_int]{vap_int()}}}{integer}
+\item{\code{\link[=vap_dbl]{vap_dbl()}}}{double}
+\item{\code{\link[=vap_chr]{vap_chr()}}}{character}
+\item{\code{\link[=vap_lgl]{vap_lgl()}}}{logical}
+\item{\code{\link[=vap_cplx]{vap_cplx()}}}{complex}
+\item{\code{\link[=vap_date]{vap_date()}}}{Date}
 }
 }
 \seealso{
-\code{\link[base:lapply]{base::vapply()}}
+\code{\link[base:vapply]{base::vapply()}}
 }

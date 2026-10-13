@@ -13,7 +13,7 @@ read_bib(file, skip = 0L, max_lines = NULL, encoding = "UTF-8")
 
 \item{max_lines}{The maximum number of lines to read}
 
-\item{encoding}{Assumed encoding of file (passed to \code{\link[=readLines]{readLines()}}}
+\item{encoding}{Assumed encoding of file (passed to \code{\link[base:readLines]{base::readLines()}}}
 }
 \value{
 A \code{data.frame} with each row as a bib entry and each column as a
@@ -33,13 +33,13 @@ This will also include as many categories as possible from the entry.
 file <- "https://raw.githubusercontent.com/jmbarbone/bib-references/master/references.bib"
 bibdf <- read_bib(file, max_lines = 51L)
 
-if (package_available("tibble")) {
+if (fuj::available_namespace("tibble")) {
   tibble::as_tibble(bibdf)
 } else {
   head(bibdf)
 }
 
-if (package_available("bib2df") & package_available("bench")) {
+if (fuj::available_namespace("bib2df") & fuj::available_namespace("bench")) {
   file <- system.file("extdata", "bib2df_testfile_3.bib", package = "bib2df")
 
   # Doesn't include the 'tidying' up

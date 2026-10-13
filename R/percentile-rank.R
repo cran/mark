@@ -37,7 +37,7 @@
 #' x <- c(1, 2, 1, 7, 5, NA_integer_, 7, 10)
 #' percentile_rank(x)
 #'
-#' if (package_available("dplyr")) {
+#' if (fuj::available_namespace("dplyr")) {
 #'   dplyr::percent_rank(x)
 #' }
 #'
@@ -79,7 +79,7 @@ do_percentile_rank <- function(u, w) {
     res <- (cumsum(p) - 0.5) / n
   } else {
     if (length(w) != length(u)) {
-      stop(cond_do_percentile_rank_weights())
+      stop(input_error("length(weights) must be 1L or equal to length(x)"))
     }
 
     ok <- stats::complete.cases(u, w)
@@ -92,13 +92,4 @@ do_percentile_rank <- function(u, w) {
   names(out) <- u
   out[ok] <- res
   out
-}
-
-# conditions --------------------------------------------------------------
-
-cond_do_percentile_rank_weights <- function() { # nolint: object_length_linter.
-  new_condition(
-    "length(weights) must be 1L or equal to length(x)",
-    "do_percentile_rank_weights"
-  )
 }

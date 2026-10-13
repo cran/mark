@@ -1,9 +1,10 @@
-
 which0 <- function(x) {
   which(x) %len% 0L
 }
+
 # isTRUE, isFALSE, ...
-isNA <- function(x) { # nolint: object_name_linter.
+# nolint next: object_name_linter.
+isNA <- function(x) {
   is.logical(x) && length(x) == 1L && is.na(x)
 }
 
@@ -13,8 +14,11 @@ use_color <- function() {
 }
 
 # nolint start: brace_linter.
+# fmt: skip
 crayon_blue  <- function(x) { if (use_color()) crayon::blue(x)  else x }
+# fmt: skip
 crayon_green <- function(x) { if (use_color()) crayon::green(x) else x }
+# fmt: skip
 crayon_cyan  <- function(x) { if (use_color()) crayon::cyan(x)  else x }
 # nolint end: brace_linter.
 
@@ -47,7 +51,8 @@ print_no_attr <- function(x, ...) {
 #'
 #' @export
 #' @seealso [base::which()]
-that <- function(x, arr.ind = FALSE, useNames = TRUE) { # nolint: object_name_linter, line_length_linter.
+# nolint next: object_name_linter.
+that <- function(x, arr.ind = FALSE, useNames = TRUE) {
   # TODO consider that() as #seq_along(x)[x]?
   which(x, arr.ind = arr.ind, useNames = useNames)
 }
@@ -88,15 +93,24 @@ is_unique <- function(x) {
   anyDuplicated(x) == 0L
 }
 
-is_atomic0 <- function(x) {
-  is.atomic(x) && !is.null(x)
+# since 4.4.0 is.atomic(NULL) returns FALSE
+is_atomic0 <- if (getRversion() < "4.4.0") {
+  function(x) is.atomic(x) && !is.null(x)
+} else {
+  base::is.atomic
 }
 
-# nolint start: brace_linter.
-cat0 <- function(...) { cat(..., sep = "") }
-catln <- function(...) { cat(..., sep = "\n") }
-charexpr <- function(x) { as.character(as.expression(x)) }
-# nolint end: brace_linter.
+cat0 <- function(...) {
+  cat(..., sep = "")
+}
+
+catln <- function(...) {
+  cat(..., sep = "\n")
+}
+
+charexpr <- function(x) {
+  as.character(as.expression(x))
+}
 
 mark_temp <- function(ext = "") {
   if (!grepl("^[.]", ext) && !identical(ext, "") && !is.na(ext)) {
@@ -114,25 +128,24 @@ mark_temp <- function(ext = "") {
 }
 
 check_is_vector <- function(x, mode = "any") {
+  nm <- deparse1(substitute(x))
+  # fmt: skip
   if (
     isS4(x) ||
     inherits(x, c("data.frame", "matrix", "array")) ||
     !is.vector(remove_attributes(x), mode)
   ) {
-    x <- deparse1(substitute(x))
-    stop(cond_check_is_vector_mode(x, mode))
+    stop(
+      input_error(
+        switch(
+          mode,
+          any = sprintf("`%s` must be a vector", nm),
+          sprintf("`%s` must be a vector of mode '%s'", nm, mode)
+        )
+      )
+    )
   }
-
-  invisible()
 }
-
-cond_check_is_vector_mode <- function(x, mode) {
-  new_condition(
-    paste(x, "must be a vector of mode", mode),
-    "check_is_vector_mode"
-  )
-}
-
 
 add_attributes <- function(x, ...) {
   attributes(x) <- c(attributes(x), rlang::list2(...))
@@ -178,15 +191,22 @@ check_interactive <- function() {
     return(FALSE)
   }
 
-  stop(cond_check_interactive())
+  stop(options_error("interactive"))
 }
 
-cond_check_interactive <- function() {
-  new_condition(
-    "mark.check_interactive must be TRUE, FALSE, or NA",
-    "check_interactive"
+# TODO is this even needed?  Maybe if options were active bindings
+options_error %:=%
+  condition(
+    message = function(type) {
+      switch(
+        type,
+        interactive = "mark.check_interactive must be TRUE, FALSE, or NA",
+        stop(internal_error(paste("bad value:", type)))
+      )
+    },
+    classes = "input_error",
+    type = "error"
   )
-}
 
 try_formats <- function(date = FALSE) {
   x <- c(
@@ -214,25 +234,15 @@ has_char <- function(x) {
 
 dupe_check <- function(x, n = getOption("mark.dupe.n", 5)) {
   n <- as.integer(n)
+  dupes <- duplicated(x)
 
-  dupes <- which(duplicated(x))
-  n_dupes <- length(dupes)
-  dupes <- utils::head(dupes, n)
-
-  if (n_dupes) {
-    stop(cond_dupe_check(x, dupes, n_dupes, n))
+  if (any(dupes)) {
+    stop(duplicate_error(x = x, positions = which(dupes)))
   }
 
   invisible(NULL)
 }
 
-cond_dupe_check <- function(x, dupes, n_dupes, n) {
-  msg <- paste0(
-    "Duplicate values found in ", n_dupes, " location(s) :\n",
-    if (n_dupes > n) sprintf("(first %i)\n", n),
-    paste0("  > ", sprintf("[%s] %s", format(dupes), format(x[dupes])), "\n"),
-    if (n_dupes > n) "... and ", n_dupes - n, " more"
-  )
-
-  new_condition(msg, "dupe_check")
+dataframe <- function(...) {
+  fuj::quick_df(list(...))
 }

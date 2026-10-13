@@ -1,3 +1,5 @@
+# TODO replace mark::match_arg() with fuj::match_arg()
+
 #' Match arguments
 #'
 #' Match arguments
@@ -11,16 +13,17 @@
 #' @param table A table of choices
 #' @return A single value from `x` matched on `table`
 #'
-#' @seealso [match_param()]
+#' @seealso [mark::match_param()]
 #' @examples
+#' shh <- function(expr) suppressWarnings(expr, "deprecated_warning")
 #' x <- c("apple", "banana", "orange")
-#' match_arg("b", x)
+#' shh(match_arg("b", x))
 #'
 #' # Produces error
-#' try(match_arg("pear", x))
+#' shh(try(match_arg("pear", x)))
 #'
 #' foo <- function(x, op = c(1, 2, 3)) {
-#'   op <- match_arg(op)
+#'   op <- shh(match_arg(op))
 #'   x / op
 #' }
 #'
@@ -30,6 +33,12 @@
 #' try(foo(1, 0))
 #' @export
 match_arg <- function(x, table) {
+  warning(deprecated_warning(
+    deprecated = "mark::match_arg()",
+    replacement = "mark::match_param()",
+    version = "0.10.0"
+  ))
+
   if (is.null(x)) {
     return(NULL)
   }
@@ -44,7 +53,7 @@ match_arg <- function(x, table) {
 
   if (!length(out)) {
     csx <- as.character(substitute(x))
-    stop(cond_match_arg(csx, x, table))
+    stop(match_arg_error(csx, x, table))
   }
 
   out
@@ -64,12 +73,14 @@ match_arg <- function(x, table) {
 #'   of formula objects (preferred) retains the LHS of the formula as the return
 #'   value when matched to the RHS of the formula.
 #' @param null If `TRUE` allows `NULL` to be passed a `param`
-#' @param partial If `TRUE` allows partial matching via [pmatch()]
+#' @param partial If `TRUE` allows partial matching via [base::pmatch()]
 #' @param multiple If `TRUE` allows multiple values to be returned
 #' @param simplify If `TRUE` will simplify the output to a single value
 #' @return A single value from `param` matched on `choices`
 #'
-#' @seealso [match_arg()]
+#' @section Conditions:
+#' `r cnd::cnd_section("match_param")`
+#'
 #' @examples
 #' fruits <- function(x = c("apple", "banana", "orange")) {
 #'   match_param(x)
@@ -105,12 +116,12 @@ match_arg <- function(x, table) {
 #' sapply(0:5, match_param, choices = ls)
 #' @export
 match_param <- function(
-    param,
-    choices,
-    null = TRUE,
-    partial = getOption("mark.match_param.partial", FALSE),
-    multiple = FALSE,
-    simplify = TRUE
+  param,
+  choices,
+  null = TRUE,
+  partial = getOption("mark.match_param.partial", FALSE),
+  multiple = FALSE,
+  simplify = TRUE
 ) {
   param_c <- charexpr(substitute(param))
   force(param)
@@ -120,7 +131,7 @@ match_param <- function(
       return(NULL)
     }
 
-    stop(cond_match_param_null())
+    stop(input_error("match_param() requires non-NULL params"))
   }
 
   missing_choices <- missing(choices)
@@ -134,8 +145,7 @@ match_param <- function(
   mchoices <- cleanup_param_list(choices)
 
   if (anyDuplicated(unlist(mchoices$choices))) {
-    # TODO implement cond_match_param_dupes()
-    stop(cond_match_param_dupes(choices))
+    stop(duplicate_error(x = choices))
   }
 
   fun <- if (partial) pmatch else match
@@ -151,7 +161,7 @@ match_param <- function(
       param <- deparse(param)
     }
 
-    stop(cond_match_param_match(
+    stop(match_param_error(
       input = param_c,
       argument = ocall,
       param = param,
@@ -159,7 +169,7 @@ match_param <- function(
     ))
   }
 
-  res <- lapply(m, function(i) mchoices$values[[i]])
+  res <- lapply(m, \(i) mchoices$values[[i]])
 
   if (simplify) {
     res <- unlist0(res)
@@ -195,110 +205,74 @@ cleanup_param_list <- function(x) {
 
 # conditions --------------------------------------------------------------
 
-cond_match_arg <- function(csx, x, table) {
-  table <-  collapse(table, sep = "\', \'")
-  new_condition(
-    sprintf(
-      "%s : '%s' did not match of of the following:\n   '%s'",
-      csx, x, table
-    ),
-    "cond_match_arg"
+# TODO remove
+match_arg_error %:=%
+  condition(
+    message = function(csx, x, table) {
+      sprintf(
+        "%s : '%s' did not match of of the following:\n   '%s'",
+        csx,
+        x,
+        table
+      )
+    },
+    type = "error",
+    classes = "input_error"
   )
-}
 
-cond_match_param_null <- function() {
-  new_condition(
-    "match_param() requires non-NULL params",
-    "cond_match_param_null"
-  )
-}
-
-cond_match_param_match <- function(
-    input,
-    argument,
-    param,
-    choices
-) {
-  to_value <- function(x) {
-    if (all(names(x) == as.character(x))) {
-      return(toString(x))
-    }
-
-    nms <- names(x)
-    if (is.null(nms)) {
-      return(toString(x))
-    }
-
-    ok <- nzchar(nms)
-    nms[ok] <- paste(nms[ok], "= ")
-    toString(paste0(nms, x))
-  }
-
-  to_options <- function(x) {
-    if (all(names(x) == as.character(x))) {
-      return(toString(x))
-    }
-
-    collapse(mapply(
-      function(x, nm) {
-        if (nzchar(nm)) {
-          sprintf("%s = %s", nm, toString(x))
-        } else {
-          toString(x)
+match_param_error %:=%
+  condition(
+    message = function(input, argument, param, choices) {
+      to_value <- function(x) {
+        if (all(names(x) == as.character(x))) {
+          return(toString(x))
         }
-      },
-      x = x,
-      nm = names(x),
-      USE.NAMES = FALSE
-    ), sep = " | ")
-  }
 
-  msg <- sprintf(
-    paste0(
-      "`match_param(%s)` failed in `%s`:\n",
-      "  param    %s\n",
-      "  choices  %s"
-    ),
-    input,
-    argument,
-    to_value(param),
-    to_options(choices)
-  )
+        nms <- names(x)
+        if (is.null(nms)) {
+          return(toString(x))
+        }
 
-  new_condition(msg, "match_param_match")
-}
+        ok <- nzchar(nms)
+        nms[ok] <- paste(nms[ok], "= ")
+        toString(paste0(nms, x))
+      }
 
-cond_match_param_dupes <- function(choices) {
-  to_choices <- function(x) {
-    if (all(names(x) == as.character(x))) {
-      dupe <- duplicated(x)
-      x[dupe] <- paste0(x[dupe], "*")
-      return(toString(x))
-    }
+      to_options <- function(x) {
+        if (all(names(x) == as.character(x))) {
+          return(toString(x))
+        }
 
-    collapse(mapply(
-      function(x, nm, d) {
-        sprintf(
-          "%s = %s",
-          nm,
-          toString(paste0(x, ifelse(d, "*", "")))
+        collapse(
+          mapply(
+            function(x, nm) {
+              if (nzchar(nm)) {
+                sprintf("%s = %s", nm, toString(x))
+              } else {
+                toString(x)
+              }
+            },
+            x = x,
+            nm = names(x),
+            USE.NAMES = FALSE
+          ),
+          sep = " | "
         )
-      },
-      x = x,
-      nm = names(x),
-      d = split(
-        duplicated(unlist(x)),
-        rep(seq_along(x), lengths(x))
-      ),
-      USE.NAMES = FALSE
-    ), sep = "\n  ")
-  }
+      }
 
-  new_condition(
-    msg = paste0(
-      "duplicate values found in `choices`:\n  ",
-      to_choices(choices)
-    ),
-    class = "match_param_dupes"
+      sprintf(
+        paste0(
+          "`match_param(%s)` failed in `%s`:\n",
+          "  param    %s\n",
+          "  choices  %s"
+        ),
+        input,
+        argument,
+        to_value(param),
+        to_options(choices)
+      )
+    },
+    type = "error",
+    classes = "input_error",
+    exports = "match_param"
   )
-}

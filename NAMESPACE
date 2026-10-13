@@ -71,6 +71,7 @@ S3method(remove_na,factor)
 S3method(remove_na,list)
 S3method(to_boolean,character)
 S3method(to_boolean,factor)
+S3method(to_boolean,integer)
 S3method(to_boolean,logical)
 S3method(to_boolean,numeric)
 S3method(unique,fact)
@@ -162,6 +163,7 @@ export(has_message)
 export(has_warning)
 export(import)
 export(insert)
+export(isNA)
 export(is_blank)
 export(is_blank_cols)
 export(is_boolean)
@@ -194,10 +196,12 @@ export(muffle)
 export(multi_grep)
 export(multi_grepl)
 export(names_switch)
+export(nand)
 export(newest_dir)
 export(newest_file)
 export(no_match)
 export(none)
+export(nor)
 export(norm_path)
 export(normalize)
 export(not_available)
@@ -235,6 +239,7 @@ export(remove_names)
 export(remove_null)
 export(require_namespace)
 export(round_by)
+export(round_to)
 export(row_bind)
 export(rscript)
 export(save_source)
@@ -290,30 +295,50 @@ export(within_fun)
 export(write_clipboard)
 export(write_file_md5)
 export(wuffle)
-import(fuj)
-importFrom(fuj,"%::%")
-importFrom(fuj,"%:::%")
-importFrom(fuj,"%colons%")
-importFrom(fuj,"%len%")
-importFrom(fuj,"%names%")
-importFrom(fuj,"%out%")
-importFrom(fuj,"%wi%")
-importFrom(fuj,"%wo%")
-importFrom(fuj,"%||%")
-importFrom(fuj,any_match)
-importFrom(fuj,exattr)
-importFrom(fuj,flip)
-importFrom(fuj,is_linux)
-importFrom(fuj,is_macos)
-importFrom(fuj,is_named)
-importFrom(fuj,is_windows)
-importFrom(fuj,muffle)
-importFrom(fuj,no_match)
-importFrom(fuj,quick_df)
-importFrom(fuj,quick_dfl)
-importFrom(fuj,remove_names)
-importFrom(fuj,require_namespace)
-importFrom(fuj,set_names)
-importFrom(fuj,struct)
-importFrom(fuj,wuffle)
+export(xnandr)
+importFrom(cnd,
+  class_error,
+  cnd,
+  cnd_create_registry,
+  cnd_document,
+  cnd_exports,
+  condition,
+  deprecated_warning,
+  duplicate_error,
+  duplicate_warning,
+  input_error,
+  input_warning,
+  type_error,
+  value_error
+)
+importFrom(fuj,
+  "%::%",
+  "%:::%",
+  "%colons%",
+  "%len%",
+  "%names%",
+  "%out%",
+  "%wi%",
+  "%wo%",
+  "%||%",
+  "%|||%",
+  any_match,
+  collapse,
+  exattr,
+  flip,
+  is_linux,
+  is_macos,
+  is_named,
+  is_windows,
+  list0,
+  muffle,
+  no_match,
+  quick_df,
+  quick_dfl,
+  remove_names,
+  require_namespace,
+  set_names,
+  struct,
+  wuffle
+)
 importFrom(magrittr,"%>%")

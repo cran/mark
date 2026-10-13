@@ -18,11 +18,11 @@ q50(x, type = 7, na.rm = FALSE)
 \item{type}{an integer between 1 and 9 selecting one of the
     nine quantile algorithms detailed below to be used.}
 
-\item{na.rm}{logical; if true, any \code{\link{NA}} and \code{NaN}'s
+\item{na.rm}{logical; if true, any \code{\link{NA}} and \code{NaN} values
     are removed from \code{x} before the quantiles are computed.}
 }
 \value{
-See \code{stats::quantile()}
+See \code{\link[stats:quantile]{stats::quantile()}}
 }
 \description{
 Median as the 50th quantile with an option to select quantile algorithm

@@ -1,29 +1,29 @@
 #' Write file with md5 hash check
 #'
-#' @section `options()`:
+#' @section Options:
 #'
 #' - `mark.compress.method`: compression method to use when writing files
 #' - `mark.list.hook`: when a `data.frame` contains a `list` column, this
-#'   function is applied to each element of the list.  The default `"auto"`
-#'   uses `toJSON()` if the package `jsonlite` is available, otherwise
-#'
+#'   function is applied to each element of the list.  The default `"auto"` uses
+#'   `jsonlite::toJSON()` if the package `jsonlite` is available, otherwise
 #'
 #' @param x An object to write to file
 #' @param path The file or connection to write to (dependent on part by method)
 #' @param method The method of saving the file.  When `default`, the method is
 #'   determined by file extension of `path`, if present, otherwise by the type
 #'   of object of `x`.
-#' @inheritParams file_copy_md5
 #' @param encoding The encoding to use when writing the file.
 #' @param compression The compression method to use when writing the file.
 #' @param ... Additional arguments passed to the write function.
+#' @inheritParams file_copy_md5
 #' @returns
-#' - [write_file_md5()]: `x`, invisibly.  When `path` is not the `stdout()`, `x`
-#' is returned with the attribute `"path"` set to the result of
-#' [file_copy_md5()].
-#' - [mark_write_methods()]: A list of applicable methods and their aliases
-#' - [mark_compress_methods()]: A character vector of applicable compression
-#' methods
+#' - [mark::write_file_md5()]: `x`, invisibly.  When `path` is not the
+#'   [base::stdout()], `x` is returned with the attribute `"path"` set to the
+#'   result of [mark::file_copy_md5()].
+#' - [mark::mark_write_methods()]: A list of applicable methods and their
+#'   aliases
+#' - [mark::mark_compress_methods()]: A character vector of applicable
+#'   compression methods
 #' @examples
 #' # just writes to stdout()
 #' df <- data.frame(a = 1, b = 2)
@@ -37,14 +37,14 @@
 #' fs::file_delete(temp)
 #' @export
 write_file_md5 <- function(
-    x,
-    path = NULL,
-    method = mark_write_methods(),
-    overwrite = NA,
-    quiet = FALSE,
-    encoding = "UTF-8",
-    compression = getOption("mark.compress.method", mark_compress_methods()),
-    ...
+  x,
+  path = NULL,
+  method = mark_write_methods(),
+  overwrite = NA,
+  quiet = FALSE,
+  encoding = "UTF-8",
+  compression = getOption("mark.compress.method", mark_compress_methods()),
+  ...
 ) {
   compression <- match_param(compression, mark_compress_methods())
   op <- options(
@@ -54,10 +54,11 @@ write_file_md5 <- function(
   )
   on.exit(options(op), add = TRUE)
 
+  # fmt: skip
   if (
     !isTRUE(nzchar(path, keepNA = TRUE)) ||
-    inherits(path, "terminal")
-  )  {
+      inherits(path, "terminal")
+  ) {
     null_path <- TRUE
     ext <- ""
   } else {
@@ -106,8 +107,12 @@ write_file_md5 <- function(
     temp <- fs::file_temp(ext = ext)
     attributes(temp) <- attributes(path)
     on.exit(safe_fs_delete(temp), add = TRUE)
-    params$con <- compress(temp, compression)
-    on.exit(safe_close(params$con), add = TRUE)
+    if (method %in% c("feather", "parquet")) {
+      params$con <- temp
+    } else {
+      params$con <- compress(temp, compression)
+      on.exit(safe_close(params$con), add = TRUE)
+    }
   }
 
   do.call(write_function, params)
@@ -121,6 +126,7 @@ write_file_md5 <- function(
   temp <- hook(temp) %||% temp
 
   if (!is.null(attr(x, "path"))) {
+    # NOTE this should be fairly rare, right?
     warning("attr(x, \"path\") is being overwritten")
   }
 
@@ -172,12 +178,12 @@ mark_write_rds <- function(x, con, version = 3) {
 }
 
 mark_write_csv <- function(
-    x,
-    con,
-    sep = ",",
-    dec = ".",
-    qmethod = "double",
-    ...
+  x,
+  con,
+  sep = ",",
+  dec = ".",
+  qmethod = "double",
+  ...
 ) {
   mark_write_table(
     x = x,
@@ -190,12 +196,12 @@ mark_write_csv <- function(
 }
 
 mark_write_csv2 <- function(
-    x,
-    con,
-    sep = ";",
-    dec = ",",
-    qmethod = "double",
-    ...
+  x,
+  con,
+  sep = ";",
+  dec = ",",
+  qmethod = "double",
+  ...
 ) {
   mark_write_table(
     x = x,
@@ -208,12 +214,12 @@ mark_write_csv2 <- function(
 }
 
 mark_write_csv3 <- function(
-    x,
-    con,
-    sep = "|",
-    dec = ".",
-    qmethod = "double",
-    ...
+  x,
+  con,
+  sep = "|",
+  dec = ".",
+  qmethod = "double",
+  ...
 ) {
   mark_write_table(
     x = x,
@@ -234,19 +240,17 @@ mark_write_tsv2 <- function(x, con, sep = "|", qmethod = "double", ...) {
 }
 
 mark_write_table <- function(
-    x,
-    con = "",
-    quote = TRUE,
-    sep = " ",
-    eol = "\n",
-    na = "",
-    dec = ".",
-    # nolint next: object_name_linter.
-    row.names = FALSE,
-    # nolint next: object_name_linter.
-    col.names = NA,
-    qmethod = "escape",
-    list_hook = getOption("mark.list.hook", "auto")
+  x,
+  con = "",
+  quote = TRUE,
+  sep = " ",
+  eol = "\n",
+  na = "",
+  dec = ".",
+  row.names = FALSE, # nolint: object_name_linter.
+  col.names = NA, # nolint: object_name_linter.
+  qmethod = "escape",
+  list_hook = getOption("mark.list.hook", "auto")
 ) {
   if (isFALSE(row.names) && isNA(col.names)) {
     # nolint next: object_name_linter.
@@ -291,7 +295,7 @@ get_list_hook <- function(hook) {
 
   switch(
     hook,
-    auto = if (package_available("jsonlite")) {
+    auto = if (fuj::available_namespace("jsonlite")) {
       get_list_hook("json")
     } else {
       get_list_hook("default")
@@ -301,23 +305,22 @@ get_list_hook <- function(hook) {
     false = function(x) NA_character_,
     none = NULL,
     # nolint next: brace_linter.
-    na = function(x) stop(new_condition(
-      "options(mark.list.hook) is NA but list columns detected",
-      class = "writeFileMd5ListHook"
-    )),
+    na = function(x) {
+      stop(value_error(
+        "options(mark.list.hook) is NA but list columns detected"
+      ))
+    },
     match.fun(hook)
   )
 }
 
 mark_write_dcf <- function(
-    x,
-    con = "",
-    # nolint next: object_name_linter.
-    useBytes = FALSE,
-    indent = 4,
-    width = Inf,
-    # nolint next: object_name_linter.
-    keep.white = NULL
+  x,
+  con = "",
+  useBytes = FALSE, # nolint: object_name_linter.
+  indent = 4,
+  width = Inf,
+  keep.white = NULL # nolint: object_name_linter.
 ) {
   write.dcf(
     x = x,
@@ -335,11 +338,11 @@ mark_write_lines <- function(x, con, sep = "\n") {
 }
 
 mark_write_yaml <- function(
-    x,
-    con,
-    unicode = TRUE,
-    digits = getOption("digits"),
-    ordered_lists = TRUE
+  x,
+  con,
+  unicode = TRUE,
+  digits = getOption("digits"),
+  ordered_lists = TRUE
 ) {
   require_namespace("yaml")
   string <- yaml::as.yaml(
@@ -351,17 +354,7 @@ mark_write_yaml <- function(
     unicode = unicode,
     precision = digits,
     indent.mapping.sequence = FALSE,
-    handlers = list(
-      boolean = function(x) {
-        # nocov start
-        if (x %in% c("n", "y")) {
-          x
-        } else {
-          tolower(x) == "true"
-        }
-        # nocov end
-      }
-    )
+    handlers = list(logical = yaml::verbatim_logical)
   )
   mark_write_lines(string, con)
 }
@@ -381,46 +374,102 @@ mark_write_parquet <- function(x, con, ...) {
 }
 
 mark_write_arrow <- function(
-    x,
-    con,
-    ...,
-    .method = c("feather", "parquet")
+  x,
+  con,
+  ...,
+  .method = c("feather", "parquet")
 ) {
-  require_namespace("arrow")
   .method <- mark::match_param(.method)
 
   switch(
     .method,
     feather = {
-      read <- arrow::read_feather
-      write <- arrow::write_feather
+      require_namespace("feather")
+      read <- feather::feather_metadata
+      write <- feather::write_feather
       clean <- function() NULL
     },
     parquet = {
-      read <- arrow::read_parquet
-      write <- arrow::write_parquet
+      require_namespace("nanoparquet")
+      read <- nanoparquet::read_parquet_schema
+      write <- nanoparquet::write_parquet
       clean <- base::gc
     }
   )
 
   if (identical(con, stdout())) {
-    temp <- tempfile()
-    con <- file(temp, open = "wb", encoding = "UTF-8")
+    con <- tempfile()
     on.exit({
-      co <- utils::capture.output(read(temp, as_data_frame = FALSE))
-      # Something weird was happening after reading the parquet object on
-      # windows; fs::file_delete() was throwing an EPERM error but file.remove()
-      # wasn't. Adding an explicit gc() seems to do the trick...
+      print(read(con))
       clean()
-      co <- grep("See $metadata", co, value = TRUE, invert = TRUE, fixed = TRUE)
-      co <- co[nzchar(co)]
-      writeLines(co)
-      safe_close(con)
-      safe_fs_delete(temp)
+      safe_fs_delete(con)
     })
+  } else if (inherits(con, "connection")) {
+    warning(
+      sprintf(
+        "Connections are not supported when writing with '%s'",
+        .method
+      ),
+      call. = FALSE,
+      immediate. = TRUE
+    )
   }
 
-  write(x, sink = con, ...)
+  args <- set_names(
+    list(x, con),
+    names(formals(write)[1:2])
+  )
+  do.call(write, c(args, list(...)))
+}
+
+mark_write_md <- function(
+  x,
+  con,
+  format = c("default", "compact"),
+  na = NA_character_,
+  ...
+) {
+  format <- match_param(format)
+  m <- rbind(NA, NA, unname(as.matrix(x)))
+  n <- ncol(x)
+  numeric <- vap_lgl(x, is.numeric)
+  align <- rep("left", n)
+  align[numeric] <- "right"
+  m[is.na(m)] <- na
+
+  for (i in seq_along(x)) {
+    m[, i] <- base::format(
+      c(colnames(x)[i], "", m[-(1:2), i]),
+      trim = format == "compact",
+      justify = align[i]
+    )
+  }
+
+  m[2L, ] <- strrep(
+    "-",
+    switch(
+      format,
+      default = nchar(m[1L, ]) - 1L,
+      compact = rep(2L, n)
+    )
+  )
+
+  m[2L, numeric] <- paste0(m[2L, numeric], ":")
+  m[2L, !numeric] <- paste0(":", m[2L, !numeric])
+
+  if (format == "compact") {
+    m <- trimws(m)
+  }
+
+  cat(
+    paste0(
+      "|",
+      apply(m, 1L, paste0, collapse = "|"),
+      "|",
+      collapse = "\n"
+    ),
+    file = con
+  )
 }
 
 # helpers -----------------------------------------------------------------
@@ -445,10 +494,10 @@ mark_to_json <- function(x) {
 }
 
 compress <- function(
-    x = "",
-    method = getOption("mark.compress.method", "default"),
-    encoding = getOption("mark.write_table.encoding", "UTF-8"),
-    ...
+  x = "",
+  method = getOption("mark.compress.method", "default"),
+  encoding = getOption("mark.write_table.encoding", "UTF-8"),
+  ...
 ) {
   op <- options(encoding = encoding)
   on.exit(options(op), add = TRUE)
@@ -466,10 +515,9 @@ compress <- function(
 
   if (identical(attr(path, "extra"), "tar")) {
     if (method == "zip") {
-      stop(
-        "'zip' is not a valid method when writing to a tar archive",
-        call. = FALSE
-      )
+      stop(input_error(
+        "'zip' is not a valid method when writing to a tar archive"
+      ))
     }
     # tar() can do the compression for us, so we move this to a temporary
     # option.  this is always cleaned up because it shouldn't be set manually
@@ -567,6 +615,6 @@ safe_close <- function(con, ...) {
 
 safe_fs_delete <- function(x) {
   if (fs::file_exists(x)) {
-    fs::file_delete(x)
+    tryCatch(fs::file_delete(x), fs_error = \(e) NA_character_)
   }
 }

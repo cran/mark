@@ -45,45 +45,52 @@ NULL
 
 #' @export
 #' @rdname handlers
-has_warning <- function(x, FUN, ...) { # nolint: object_name_linter, line_length_linter.
+# nolint next: object_name_linter
+has_warning <- function(x, FUN, ...) {
   has_catch(x, FUN, ..., type = "warning")
 }
 
 #' @export
 #' @rdname handlers
-has_error <- function(x, FUN, ...) { # nolint: object_name_linter, line_length_linter.
+# nolint next: object_name_linter
+has_error <- function(x, FUN, ...) {
   has_catch(x, FUN, ..., type = "error")
 }
 
 #' @export
 #' @rdname handlers
-has_message <- function(x, FUN, ...) { # nolint: object_name_linter, line_length_linter.
+# nolint next: object_name_linter
+has_message <- function(x, FUN, ...) {
   has_catch(x, FUN, ..., type = "message")
 }
 
 #' @export
 #' @rdname handlers
-get_warning <- function(x, FUN, ..., .null = TRUE) { # nolint: object_name_linter, line_length_linter.
+# nolint next: object_name_linter
+get_warning <- function(x, FUN, ..., .null = TRUE) {
   get_catch(x, FUN, type = "warning", null = .null)
 }
 
 #' @export
 #' @rdname handlers
-get_message <- function(x, FUN, ..., .null = TRUE) { # nolint: object_name_linter, line_length_linter.
+# nolint next: object_name_linter
+get_message <- function(x, FUN, ..., .null = TRUE) {
   get_catch(x, FUN, type = "message", null = .null)
 }
 
 #' @export
 #' @rdname handlers
-get_error <- function(x, FUN, ..., .null = TRUE) { # nolint: object_name_linter, line_length_linter.
+# nolint next: object_name_linter
+get_error <- function(x, FUN, ..., .null = TRUE) {
   get_catch(x, FUN, type = "error", null = .null)
 }
 
-has_catch <- function(x, FUN, ..., type = c("error", "warning", "message")) { # nolint: object_name_linter, line_length_linter.
+# nolint next: object_name_linter
+has_catch <- function(x, FUN, ..., type = c("error", "warning", "message")) {
   type <- match_param(type)
   FUN <- match.fun(FUN) # nolint: object_name_linter.
   res <- sapply(x, catch(FUN), ..., USE.NAMES = TRUE, simplify = FALSE)
-  out <- vap_lgl(res, function(i) !is.null(i[[type]]))
+  out <- vap_lgl(res, \(i) !is.null(i[[type]]))
   attr(out, "result") <- lapply(res, `[[`, "result")
   attr(out, "class") <- c("has_catch", "logical")
   set_names(out, x)
@@ -95,9 +102,10 @@ print.has_catch <- function(x, ...) {
   invisible(x)
 }
 
-get_catch <- function(x, FUN, type, ..., null = TRUE) { # nolint: object_name_linter, line_length_linter.
+# nolint next: object_name_linter
+get_catch <- function(x, FUN, type, ..., null = TRUE) {
   res <- sapply(x, catch(FUN), ..., USE.NAMES = TRUE, simplify = FALSE)
-  out <- sapply(res, function(i) i[[type]], USE.NAMES = TRUE, simplify = FALSE)
+  out <- sapply(res, \(i) i[[type]], USE.NAMES = TRUE, simplify = FALSE)
   out <- set_names(out, x)
 
   if (!null) {
@@ -108,14 +116,14 @@ get_catch <- function(x, FUN, type, ..., null = TRUE) { # nolint: object_name_li
 }
 
 # Adapted from https://stackoverflow.com/a/4952908/12126576
-catch <- function(FUN) { # nolint: object_name_linter.
-  FUN <- match.fun(FUN) # nolint: object_name_linter.
+catch <- function(fun) {
+  fun <- match.fun(fun)
 
   function(...) {
     env <- list2env(list(error = NULL, warning = NULL, message = NULL))
     res <- withCallingHandlers(
       tryCatch(
-        FUN(...),
+        fun(...),
         error = function(e) {
           env$error <- c(env$error, e$message)
           NULL

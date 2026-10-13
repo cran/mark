@@ -1,6 +1,9 @@
 test_that("not_available() works", {
   expect_error(get_not_available(), NA)
-  expect_error(get_not_available("foo"), class = "getNotAvailableError")
+  expect_error(
+    get_not_available("foo"),
+    class = "mark::not_available_error"
+  )
 
   val <- struct(NA, "foo")
   set_not_available("foo", val)
@@ -12,10 +15,13 @@ test_that("not_available() works", {
   expect_true(is.na(not_available("Date", 1)))
 
   set_not_available("foo", NULL)
-  set_not_available("foo_fun", function() NULL)
-  expect_error(get_not_available("foo_fun"), class = "getNotAvailableTypeError")
+  set_not_available("foo_fun", \() NULL)
+  expect_error(
+    get_not_available("foo_fun"),
+    class = "class_error"
+  )
 
   # reset list
   options(mark.na_list = NULL)
-  expect_identical(get_na_list(), na_list)
+  expect_identical(get_na_list(), op.mark$mark.na_list)
 })

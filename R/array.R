@@ -1,3 +1,5 @@
+# nocov start
+
 #' Array extract
 #'
 #' Extract dimensions from an array
@@ -13,16 +15,22 @@
 #' x[1, 2, 3] <- TRUE
 #' x[1, 2, 3]
 #' x
-#' array_extract(x, `2` = 2, `3` = 3)
+#' suppressWarnings(array_extract(x, `2` = 2, `3` = 3), "deprecated_warning")
 
 array_extract <- function(.arr, ..., default = "1") {
+  # what was even the point of this?
+  warning(deprecated_warning(
+    deprecated = "array_extract(a)",
+    replacement = "a[]",
+    version = "0.10.0"
+  ))
   stopifnot(is.array(.arr))
 
   ls <- rlang::list2(...)
   nm <- wuffle(as.integer(names(ls) %||% seq_along(ls)))
 
   if (anyNA(nm)) {
-    stop(cond_arary_extract_names())
+    stop(input_error("... must be fully named by integers or have no names"))
   }
 
   ds <- dim(.arr)
@@ -52,11 +60,4 @@ array_extract <- function(.arr, ..., default = "1") {
   eval(str2expression(text), envir = parent.frame())
 }
 
-# conditions --------------------------------------------------------------
-
-cond_arary_extract_names <- function() {
-  new_condition(
-    "... must be fully named by integers or have no names",
-    "array_extract_names"
-  )
-}
+# nocov end

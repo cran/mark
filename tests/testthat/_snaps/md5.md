@@ -3,19 +3,19 @@
     Code
       md5(letters)
     Output
-      d50f072f51db46c1736ee43adbba195f
+      efdb4b76073d1962b351692972a8d9e3
 
 ---
 
     Code
       md5(1:100)
     Output
-      9d6257190ff5b50a0242cea93afda52f
+      e7d409fa912dd31c9a9da6cb9eb21b32
 
 ---
 
     Code
-      md5(quick_dfl(a = 1))
+      md5(dataframe(a = 1))
     Output
-      45aa38750405b63fd8cb81b938cdf76b
+      f16311aa3f99060be519c8e9b38101e6
 

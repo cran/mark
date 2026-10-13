@@ -14,7 +14,7 @@
 #' @param file File or connection
 #' @param skip The lines to skip
 #' @param max_lines The maximum number of lines to read
-#' @param encoding Assumed encoding of file (passed to [readLines()]
+#' @param encoding Assumed encoding of file (passed to [base::readLines()]
 #'
 #' @return A `data.frame` with each row as a bib entry and each column as a
 #'   field
@@ -26,13 +26,13 @@
 #' file <- "https://raw.githubusercontent.com/jmbarbone/bib-references/master/references.bib"
 #' bibdf <- read_bib(file, max_lines = 51L)
 #'
-#' if (package_available("tibble")) {
+#' if (fuj::available_namespace("tibble")) {
 #'   tibble::as_tibble(bibdf)
 #' } else {
 #'   head(bibdf)
 #' }
 #'
-#' if (package_available("bib2df") & package_available("bench")) {
+#' if (fuj::available_namespace("bib2df") & fuj::available_namespace("bench")) {
 #'   file <- system.file("extdata", "bib2df_testfile_3.bib", package = "bib2df")
 #'
 #'   # Doesn't include the 'tidying' up
@@ -70,13 +70,13 @@ read_bib <- function(file, skip = 0L, max_lines = NULL, encoding = "UTF-8") {
   from <- grep("[@]", bib)
 
   if (!length(from)) {
-    stop(cond_read_bib_entries())
+    stop(value_error("No entries detected in bib file"))
   }
 
   # shift over (may contain white space?)
   to <- c(from[-1L] - 1L, length(bib))
 
-  item_list <- Map(function(x, y) bib[x:y], x = from, y = to - 1L)
+  item_list <- Map(\(x, y) bib[x:y], x = from, y = to - 1L)
 
   # Extract first line for speediness
   first_line <- sapply(item_list, `[`, 1L)
@@ -143,7 +143,7 @@ parse_bib_val <- function(x) {
 process_bib_dataframe <- function(categories, values, fields, keys) {
   # Determine all categories for missing values inside Map
   ucats <- unique(remove_na(unlist(categories)))
-  ucats_df <- quick_dfl(
+  ucats_df <- dataframe(
     category = ucats,
     value = rep(NA_character_, length(ucats))
   )
@@ -160,7 +160,13 @@ process_bib_dataframe <- function(categories, values, fields, keys) {
       bad <- lens > 1L
 
       if (any(bad)) {
-        stop(cond_process_bib_dataframe_dupe(key, names(lens)[bad]))
+        stop(duplicate_error(
+          sprintf(
+            "The key `%s` has duplicate categories of `%s`",
+            key,
+            names(lens)[bad]
+          )
+        ))
       }
 
       # Append vectors
@@ -168,7 +174,7 @@ process_bib_dataframe <- function(categories, values, fields, keys) {
       vals <- c(key, field, vals)
 
       # Create data.frame
-      data <- quick_dfl(category = cats, value = vals)
+      data <- dataframe(category = cats, value = vals)
 
       # Check for missing categories
       toadd <- ucats %out% cats
@@ -200,7 +206,6 @@ process_bib_list <- function(keys, fields, categories, values) {
         class = c("character", "mark_bib_entry"),
         names = c("key", "field", cats)
       )
-
     },
     key = keys[valid],
     field = fields[valid],
@@ -214,7 +219,7 @@ process_bib_list <- function(keys, fields, categories, values) {
 
 as_bib_list <- function(x, names = NULL) {
   if (!is.list(x)) {
-    stop(cond_as_bib_list_class())
+    stop(type_error("must_be", x, "list"))
   }
 
   class(x) <- c("list", "mark_bib_list")
@@ -223,7 +228,7 @@ as_bib_list <- function(x, names = NULL) {
 
 as_bib <- function(x, bib_list = NULL) {
   if (!is.data.frame(x)) {
-    stop(cond_as_bib_class())
+    stop(class_error("must_be", x, "data.frame"))
   }
 
   class(x) <- c("mark_bib_df", "data.frame")
@@ -299,39 +304,4 @@ print.mark_bib_df <- function(x, list = FALSE, ...) {
   }
 
   invisible(x)
-}
-
-
-# conditions --------------------------------------------------------------
-
-cond_read_bib_entries <- function() {
-  new_condition(
-    "No entries detected",
-    "read_bib_entries"
-  )
-}
-
-cond_process_bib_dataframe_dupe <- function(key, categories) { # nolint: object_length_linter, line_length_linter.
-  new_condition(
-    sprintf(
-      "The key `%s` has duplicate categories of `%s`",
-      key,
-      categories
-    ),
-    "process_bib_dataframe_dupe"
-  )
-}
-
-cond_as_bib_list_class <- function() {
-  new_condition(
-    "`x` must be a list",
-    "as_bib_list_class"
-  )
-}
-
-cond_as_bib_class <- function() {
-  new_condition(
-    "`x` must be a data.frame",
-    "as_bib_class"
-  )
 }
